@@ -1,0 +1,33 @@
+name: shihogen
+description: Advanced setup for Shield.
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.2 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  cached_network_image: ^3.2.3
+  adbnerve:
+    git: https://github.com/sharpordie/adbnerve
+  mvvm_plus: ^1.4.2
+  netnerve:
+    git: https://github.com/sharpordie/netnerve
+  network_discovery: ^1.0.0
+  path: ^1.8.3
+  shared_preferences: ^2.1.1
+  smooth_page_indicator: ^1.1.0
+  wakelock: ^0.6.2
+  xml: ^6.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
