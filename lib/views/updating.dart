@@ -4,6 +4,7 @@ import 'package:mvvm_plus/mvvm_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shihogen/updaters/alauncher.dart';
 import 'package:shihogen/updaters/kodinerds_nexus.dart';
+import 'package:shihogen/updaters/kodinerds_omega.dart';
 import 'package:shihogen/widgets/own_appbar.dart';
 import 'package:shihogen/widgets/own_header.dart';
 
@@ -79,12 +80,13 @@ class UpdatingViewModel extends ViewModel {
     } else {
       try {
         loading.value = true;
-        // await setAlauncher1();
-        await setKodi();
+        await setAlauncher1();
+        await setKodinerdsNexus();
+        await setKodinerdsOmega();
         // await setKodiVstream();
         // await setSpotify();
         // await setStn();
-        // await setAlauncher2();
+        await setAlauncher2();
         // await setShield();
         if (context.mounted) message.value = 'Has succeeded';
         failure.value = false;
@@ -101,25 +103,28 @@ class UpdatingViewModel extends ViewModel {
   }
 
   Future<void> setAlauncher1() async {
-    message.value = 'Alauncher package 1';
+    message.value = 'Alauncher package';
     final updater = Alauncher(android);
     await updater.runVanishCategories();
     await updater.setWallpaper(sharing.getString('picture')!);
   }
 
   Future<void> setAlauncher2() async {
-    message.value = 'Alauncher package 2';
+    message.value = 'Alauncher package';
     final updater = Alauncher(android);
     await updater.setCategory('_', 130);
     await updater.setCategory('_', 90);
     await updater.setCategory('_', 90);
-    await updater.setApplicationByIndex('Netflix', 3);
-    await updater.setApplicationByIndex('aLauncher', 3);
+    await updater.setApplicationByIndex('Kodinerds', 3);
+    await updater.setApplicationByIndex('Kodinerds Omega', 3);
   }
 
-  Future<void> setKodi() async {
-    message.value = 'Kodinerds package';
+  Future<void> setKodinerdsNexus() async {
+    message.value = 'Kodinerds Nexus package';
+    final package = KodinerdsOmega(android);
+    await android.runFinish(package.package);
     final updater = KodinerdsNexus(android);
+    await updater.runRemove();
     await updater.runUpdate();
     await android.runFinish(updater.package);
     await updater.setKodiWebserver(enabled: true, secured: false);
@@ -134,9 +139,24 @@ class UpdatingViewModel extends ViewModel {
     await updater.setKodiWebserver(enabled: false, secured: true);
   }
 
-  Future<void> setKodiVstream() async {
-    message.value = 'Vstream addon';
+  Future<void> setKodinerdsOmega() async {
+    message.value = 'Kodinerds Omega package';
+    final package = KodinerdsNexus(android);
+    await android.runFinish(package.package);
+    final updater = KodinerdsOmega(android);
+    await updater.runRemove();
+    await updater.runUpdate();
+    await android.runFinish(updater.package);
+    await updater.setKodiWebserver(enabled: true, secured: false);
+
+    await updater.setKodiLanguageForAudio('English');
+    await updater.setKodiLanguageForSubtitles('French');
+    await updater.setKodiLanguageListForDownloadedSubtitles(['French']);
+
+    await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
     await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(updater.package);
+    await updater.setKodiWebserver(enabled: false, secured: true);
   }
 
   Future<void> setShield() async {

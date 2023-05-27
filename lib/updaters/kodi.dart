@@ -15,7 +15,7 @@ class Kodi extends Updater {
 
   String get deposit => '/sdcard/Android/data/$package/files/.kodi';
 
-  // String get configs => '$deposit/userdata/guisettings.xml';
+  String get heading => 'Kodi';
 
   String get release => 'nexus';
 
@@ -47,7 +47,7 @@ class Kodi extends Updater {
 
   ///
 
-  Future<Response> getKodiSetting(String setting) async {
+  Future<Response> getSetting(String setting) async {
     final results = await setRpc({
       'jsonrpc': '2.0',
       'method': 'Settings.GetSettingValue',
@@ -57,7 +57,7 @@ class Kodi extends Updater {
     return results;
   }
 
-  Future<void> setKodiSetting(String setting, dynamic payload) async {
+  Future<void> setSetting(String setting, dynamic payload) async {
     await setRpc({
       'jsonrpc': '2.0',
       'method': 'Settings.SetSettingValue',
@@ -97,15 +97,15 @@ class Kodi extends Updater {
   ///
 
   Future<void> setKodiLanguageForAudio(String payload) async {
-    await setKodiSetting('locale.audiolanguage', payload);
+    await setSetting('locale.audiolanguage', payload);
   }
 
   Future<void> setKodiLanguageForSubtitles(String payload) async {
-    await setKodiSetting('locale.subtitlelanguage', payload);
+    await setSetting('locale.subtitlelanguage', payload);
   }
 
   Future<void> setKodiLanguageListForDownloadedSubtitles(List<String> payload) async {
-    await setKodiSetting('subtitles.languages', payload);
+    await setSetting('subtitles.languages', payload);
   }
 
   Future<void> setKodiPermissions() async {
@@ -116,7 +116,7 @@ class Kodi extends Updater {
     await android.runReveal(DeviceSetting.tvMainSettings);
     await android.runSelect('//*[@text="Apps"]');
     await android.runSelect('//*[@text="See all apps"]');
-    await android.runSelect('//*[@text="Kodinerds"]');
+    await android.runSelect('//*[@text="$heading"]');
     await android.runSelect('//*[@text="Permissions"]');
     await android.runRepeat('keycode_dpad_down');
     await android.runRepeat('keycode_enter');

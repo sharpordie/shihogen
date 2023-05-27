@@ -20,7 +20,7 @@ Widget myApp() {
     debugShowCheckedModeBanner: false,
     darkTheme: ThemeData.dark(useMaterial3: true),
     theme: ThemeData.light(useMaterial3: true),
-    themeMode: ThemeMode.light,
+    themeMode: ThemeMode.system,
     initialRoute: '/discover',
     routes: {
       '/discover': (context) => DiscoverView(),

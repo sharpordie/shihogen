@@ -11,6 +11,9 @@ class KodinerdsOmega extends Kodi {
   String get package => 'net.kodinerds.maven.kodi21';
 
   @override
+  String get heading => 'Kodinerds Omega';
+
+  @override
   String get release => 'omega';
 
   @override

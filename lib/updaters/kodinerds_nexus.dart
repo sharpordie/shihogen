@@ -11,6 +11,9 @@ class KodinerdsNexus extends Kodi {
   String get package => 'net.kodinerds.maven.kodi20';
 
   @override
+  String get heading => 'Kodinerds';
+
+  @override
   String get release => 'nexus';
 
   @override
