@@ -1,5 +1,8 @@
+import 'package:adbnerve/adbnerve.dart';
 import 'package:flutter/material.dart';
 import 'package:mvvm_plus/mvvm_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shihogen/updaters/alauncher.dart';
 import 'package:shihogen/widgets/own_appbar.dart';
 import 'package:shihogen/widgets/own_header.dart';
 
@@ -48,15 +51,23 @@ class UpdatingView extends ViewWidget<UpdatingViewModel> {
 }
 
 class UpdatingViewModel extends ViewModel {
+  late final SharedPreferences sharing;
   late final loading = createProperty<bool>(false);
   late final failure = createProperty<bool>(false);
   late final success = createProperty<bool>(false);
   late final message = createProperty<String>('In progress');
+  late final Shield android;
 
   @override
   void initState() {
     super.initState();
-    onDoneClicked();
+    () async {
+      loading.value = true;
+      sharing = await SharedPreferences.getInstance();
+      android = Shield(sharing.getString('address')!);
+      await android.runAttach();
+      await onDoneClicked();
+    }();
   }
 
   Future<void> onDoneClicked() async {
@@ -67,8 +78,12 @@ class UpdatingViewModel extends ViewModel {
     } else {
       try {
         loading.value = true;
-        await Future.delayed(const Duration(seconds: 5));
-        // throw Exception();
+        await setAlauncher();
+        await setKodi();
+        await setKodiVstream();
+        await setSpotify();
+        await setStn();
+        await setShield();
         if (context.mounted) message.value = 'Has succeeded';
         failure.value = false;
         success.value = true;
@@ -81,5 +96,38 @@ class UpdatingViewModel extends ViewModel {
         loading.value = false;
       }
     }
+  }
+
+  Future<void> setAlauncher() async {
+    message.value = 'Alauncher package';
+    await Future.delayed(const Duration(seconds: 5));
+    final updater = Alauncher(android);
+    await updater.runVanishCategories();
+    await updater.setWallpaper(sharing.getString('picture')!);
+  }
+
+  Future<void> setKodi() async {
+    message.value = 'Kodinerds package';
+    await Future.delayed(const Duration(seconds: 5));
+  }
+
+  Future<void> setKodiVstream() async {
+    message.value = 'Vstream addon';
+    await Future.delayed(const Duration(seconds: 5));
+  }
+
+  Future<void> setShield() async {
+    message.value = 'Shield settings';
+    await Future.delayed(const Duration(seconds: 5));
+  }
+
+  Future<void> setSpotify() async {
+    message.value = 'Spotify package';
+    await Future.delayed(const Duration(seconds: 5));
+  }
+
+  Future<void> setStn() async {
+    // message.value = 'SmartTubeNext package';
+    await Future.delayed(const Duration(seconds: 5));
   }
 }
