@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mvvm_plus/mvvm_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shihogen/updaters/alauncher.dart';
+import 'package:shihogen/updaters/kodinerds_nexus.dart';
 import 'package:shihogen/widgets/own_appbar.dart';
 import 'package:shihogen/widgets/own_header.dart';
 
@@ -78,12 +79,13 @@ class UpdatingViewModel extends ViewModel {
     } else {
       try {
         loading.value = true;
-        await setAlauncher();
+        // await setAlauncher1();
         await setKodi();
-        await setKodiVstream();
-        await setSpotify();
-        await setStn();
-        await setShield();
+        // await setKodiVstream();
+        // await setSpotify();
+        // await setStn();
+        // await setAlauncher2();
+        // await setShield();
         if (context.mounted) message.value = 'Has succeeded';
         failure.value = false;
         success.value = true;
@@ -98,17 +100,38 @@ class UpdatingViewModel extends ViewModel {
     }
   }
 
-  Future<void> setAlauncher() async {
-    message.value = 'Alauncher package';
-    await Future.delayed(const Duration(seconds: 5));
+  Future<void> setAlauncher1() async {
+    message.value = 'Alauncher package 1';
     final updater = Alauncher(android);
     await updater.runVanishCategories();
     await updater.setWallpaper(sharing.getString('picture')!);
   }
 
+  Future<void> setAlauncher2() async {
+    message.value = 'Alauncher package 2';
+    final updater = Alauncher(android);
+    await updater.setCategory('_', 130);
+    await updater.setCategory('_', 90);
+    await updater.setCategory('_', 90);
+    await updater.setApplicationByIndex('Netflix', 3);
+    await updater.setApplicationByIndex('aLauncher', 3);
+  }
+
   Future<void> setKodi() async {
     message.value = 'Kodinerds package';
+    final updater = KodinerdsNexus(android);
+    await updater.runUpdate();
+    await android.runFinish(updater.package);
+    await updater.setKodiWebserver(enabled: true, secured: false);
+
+    await updater.setKodiLanguageForAudio('default');
+    await updater.setKodiLanguageForSubtitles('forced_only');
+    await updater.setKodiLanguageListForDownloadedSubtitles(['English']);
+
+    await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
     await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(updater.package);
+    await updater.setKodiWebserver(enabled: false, secured: true);
   }
 
   Future<void> setKodiVstream() async {
@@ -127,7 +150,7 @@ class UpdatingViewModel extends ViewModel {
   }
 
   Future<void> setStn() async {
-    // message.value = 'SmartTubeNext package';
+    message.value = 'SmartTubeNext package';
     await Future.delayed(const Duration(seconds: 5));
   }
 }

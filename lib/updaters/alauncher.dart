@@ -68,31 +68,24 @@ class Alauncher extends Updater {
     await android.runRepeat('keycode_back', repeats: 2);
   }
 
-  // Future<void> setCategory(String payload, AlauncherCategoryType variant) async {
-  //   await android.runEscape();
-  //   await android.setLanguage(DeviceLanguage.enUs);
-  //   await android.runInvoke(['shell' 'ime set com.android.inputmethod.latin.Latin']);
-  //   await runRevealSettings();
-  //   await android.runSelect('//*[@content-desc="Categories"]');
-  //   await android.runSelect('//*[@content-desc="Add Category"]');
-  //   // await android.runRepeat('keycode_escape');
-  //   await Future.delayed(const Duration(seconds: 2)); // TODO: Maybe add this inside adbnerve
-  //   await android.runInsert(payload);
-  //   await android.runRepeat('keycode_enter');
-  //   await android.runRepeat('keycode_dpad_up', repeats: 99);
-  //   await android.runRepeat('keycode_dpad_right', repeats: 9);
-  //   await android.runRepeat('keycode_enter');
-  //   await android.runRepeat('keycode_dpad_down', repeats: 2);
-  //   await android.runRepeat('keycode_enter');
-  //   await android.runSelect('//*[@content-desc="${variant.arrange}"]');
-  //   await android.runRepeat('keycode_dpad_down');
-  //   await android.runRepeat('keycode_enter');
-  //   await android.runSelect('//*[@content-desc="${variant.section}"]');
-  //   await android.runRepeat('keycode_dpad_down');
-  //   await android.runRepeat('keycode_enter');
-  //   await android.runSelect('//*[@content-desc="${variant.bigness}"]');
-  //   await android.runRepeat('keycode_back', repeats: 3);
-  // }
+  Future<void> setCategory(String payload, int bigness) async {
+    if (![80, 90, 100, 110, 120, 130, 140, 150].contains(bigness)) return;
+    await android.runEscape();
+    await android.setLanguage(DeviceLanguage.enUs);
+    await runRevealSettings();
+    await android.runSelect('//*[@content-desc="Categories"]');
+    await android.runSelect('//*[@content-desc="Add Category"]');
+    await Future.delayed(const Duration(seconds: 2)); // TODO: Maybe add this inside adbnerve
+    await android.runInsert(payload);
+    await android.runRepeat('keycode_enter');
+    await android.runRepeat('keycode_dpad_up', repeats: 99);
+    await android.runRepeat('keycode_dpad_right', repeats: 9);
+    await android.runRepeat('keycode_enter');
+    await android.runRepeat('keycode_dpad_down', repeats: 4);
+    await android.runRepeat('keycode_enter');
+    await android.runSelect('//*[@content-desc="${bigness.toString()}"]');
+    await android.runRepeat('keycode_back', repeats: 3);
+  }
 
   Future<void> setApplicationByIndex(String payload, int section, {bool adapted = true}) async {
     await android.runEscape();
@@ -128,6 +121,9 @@ class Alauncher extends Updater {
     final fetched = await getFromAddress(payload);
     if (fetched == null) return;
     await android.runExport(fetched.path, '/sdcard/Download');
+    await android.runSelect('//*[@content-desc="Show roots"]');
+    await android.runRepeat('keycode_dpad_down', repeats: 2);
+    await android.runRepeat('keycode_enter');
     await android.runSelect('//*[@content-desc="Search"]');
     await Future.delayed(const Duration(seconds: 2));
     await android.runInsert(basename(fetched.path));
