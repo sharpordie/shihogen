@@ -80,13 +80,13 @@ class UpdatingViewModel extends ViewModel {
     } else {
       try {
         loading.value = true;
-        await setAlauncher1();
+        // await setAlauncher1();
         await setKodinerdsNexus();
-        await setKodinerdsOmega();
+        // await setKodinerdsOmega();
         // await setKodiVstream();
         // await setSpotify();
         // await setStn();
-        await setAlauncher2();
+        // await setAlauncher2();
         // await setShield();
         if (context.mounted) message.value = 'Has succeeded';
         failure.value = false;
@@ -124,11 +124,14 @@ class UpdatingViewModel extends ViewModel {
     final package = KodinerdsOmega(android);
     await android.runFinish(package.package);
     final updater = KodinerdsNexus(android);
-    await updater.runRemove();
+    // await updater.runRemove();
     await updater.runUpdate();
     await android.runFinish(updater.package);
     await updater.setKodiWebserver(enabled: true, secured: false);
 
+    await updater.setKodiAfr(enabled: true);
+    await updater.setKodiAfrDelay(seconds: 3.5);
+    await updater.setKodiAudioPassthrough(enabled: true);
     await updater.setKodiLanguageForAudio('default');
     await updater.setKodiLanguageForSubtitles('forced_only');
     await updater.setKodiLanguageListForDownloadedSubtitles(['English']);
@@ -144,11 +147,14 @@ class UpdatingViewModel extends ViewModel {
     final package = KodinerdsNexus(android);
     await android.runFinish(package.package);
     final updater = KodinerdsOmega(android);
-    await updater.runRemove();
+    // await updater.runRemove();
     await updater.runUpdate();
     await android.runFinish(updater.package);
     await updater.setKodiWebserver(enabled: true, secured: false);
 
+    await updater.setKodiAfr(enabled: true);
+    await updater.setKodiAfrDelay(seconds: 3.5);
+    await updater.setKodiAudioPassthrough(enabled: true);
     await updater.setKodiLanguageForAudio('English');
     await updater.setKodiLanguageForSubtitles('French');
     await updater.setKodiLanguageListForDownloadedSubtitles(['French']);

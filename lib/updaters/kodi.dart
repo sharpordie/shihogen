@@ -96,6 +96,25 @@ class Kodi extends Updater {
 
   ///
 
+  Future<void> setKodiAfr({bool enabled = false}) async {
+    await setSetting('videoplayer.adjustrefreshrate', enabled ? 2 : 0);
+  }
+
+  Future<void> setKodiAfrDelay({double seconds = 0}) async {
+    if (seconds < 0 || seconds > 20) return;
+    await setSetting('videoscreen.delayrefreshchange', (seconds * 10).toInt());
+  }
+
+  Future<void> setKodiAudioPassthrough({bool enabled = false}) async {
+    final payload = enabled ? [true, 10] : [false, 1];
+    await setSetting('audiooutput.channels', payload[1]);
+    await setSetting('audiooutput.dtshdpassthrough', payload[0]);
+    await setSetting('audiooutput.dtspassthrough', payload[0]);
+    await setSetting('audiooutput.eac3passthrough', payload[0]);
+    await setSetting('audiooutput.passthrough', payload[0]);
+    await setSetting('audiooutput.truehdpassthrough', payload[0]);
+  }
+
   Future<void> setKodiLanguageForAudio(String payload) async {
     await setSetting('locale.audiolanguage', payload);
   }
