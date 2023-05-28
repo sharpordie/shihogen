@@ -1,5 +1,5 @@
 name: shihogen
-description: Advanced setup for Shield.
+description: Automatic setup for Shield.
 publish_to: "none"
 
 version: 1.0.0+1

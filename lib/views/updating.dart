@@ -132,9 +132,15 @@ class UpdatingViewModel extends ViewModel {
     await updater.setKodiAfr(enabled: true);
     await updater.setKodiAfrDelay(seconds: 3.5);
     await updater.setKodiAudioPassthrough(enabled: true);
+    await updater.setKodiEnablePreferDefaultAudio(enabled: true);
+    await updater.setKodiEnableShowParentFolder(enabled: false);
+    await updater.setKodiKeyboardList(['French AZERTY']);
     await updater.setKodiLanguageForAudio('default');
     await updater.setKodiLanguageForSubtitles('forced_only');
+    await updater.setKodiLanguageForSystem('fr_fr');
     await updater.setKodiLanguageListForDownloadedSubtitles(['English']);
+    await updater.setKodiSubtitleServiceForMovies('');
+    await updater.setKodiSubtitleServiceForSeries('');
 
     await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
     await Future.delayed(const Duration(seconds: 5));
@@ -155,9 +161,15 @@ class UpdatingViewModel extends ViewModel {
     await updater.setKodiAfr(enabled: true);
     await updater.setKodiAfrDelay(seconds: 3.5);
     await updater.setKodiAudioPassthrough(enabled: true);
+    await updater.setKodiEnablePreferDefaultAudio(enabled: false);
+    await updater.setKodiEnableShowParentFolder(enabled: false);
+    await updater.setKodiKeyboardList(['French AZERTY']);
     await updater.setKodiLanguageForAudio('English');
     await updater.setKodiLanguageForSubtitles('French');
+    await updater.setKodiLanguageForSystem('fr_fr');
     await updater.setKodiLanguageListForDownloadedSubtitles(['French']);
+    await updater.setKodiSubtitleServiceForMovies('service.subtitles.a4ksubtitles');
+    await updater.setKodiSubtitleServiceForSeries('service.subtitles.a4ksubtitles');
 
     await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
     await Future.delayed(const Duration(seconds: 5));

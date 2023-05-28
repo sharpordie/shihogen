@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:adbnerve/adbnerve.dart';
 import 'package:dio/dio.dart';
+import 'package:netnerve/netnerve.dart';
 import 'package:shihogen/updaters/updater.dart';
 import 'package:xml/xml.dart';
 import 'package:xml/xpath.dart';
@@ -96,6 +97,22 @@ class Kodi extends Updater {
 
   ///
 
+  // Future<Response> getKodiFavouriteList() async {
+  //   return await setRpc({
+  //     'jsonrpc': '2.0',
+  //     'method': 'Favourites.GetFavourites',
+  //     'params': {
+  //       'properties': ['window', 'path', 'thumbnail', 'windowparameter']
+  //     },
+  //     'id': 1
+  //   });
+  // }
+
+  Future<bool> hasKodiAddon(String payload) async {
+    final command = ['shell', 'test -d "$deposit/addons/$payload"'];
+    return (await android.runInvoke(command)).exitCode == 0;
+  }
+
   Future<void> setKodiAfr({bool enabled = false}) async {
     await setSetting('videoplayer.adjustrefreshrate', enabled ? 2 : 0);
   }
@@ -115,12 +132,61 @@ class Kodi extends Updater {
     await setSetting('audiooutput.truehdpassthrough', payload[0]);
   }
 
+  Future<void> setKodiDependency(String payload, {bool imposed = false}) async {
+    final present = await hasKodiAddon(payload);
+    if (!imposed && present) return;
+    final fetcher = Dio()
+      ..options.followRedirects = true
+      ..options.headers = {'user-agent': 'mozilla/5.0'};
+    final baseurl = 'https://mirrors.kodi.tv/addons/$release';
+    final website = '$baseurl/$payload/?C=M&O=D';
+    final pattern = RegExp('href="$payload-(.*)(?=.zip" )');
+    final content = await (await fetcher.get(website)).data;
+    final version = pattern.allMatches(content).last.group(1);
+    final address = '$baseurl/$payload/$payload-$version.zip';
+    final archive = await getFromAddress(address);
+    await android.runUnpack(archive!.path, '$deposit/addons');
+  }
+
+  Future<void> setKodiEnablePreferDefaultAudio({bool enabled = false}) async {
+    await setSetting('videoplayer.preferdefaultflag', enabled ? true : false);
+  }
+
+  Future<void> setKodiEnableShowParentFolder({bool enabled = false}) async {
+    await setSetting('filelists.showparentdiritems', enabled ? true : false);
+  }
+
+  Future<void> setKodiFavourite(String heading, String variant, String starter, String? picture) async {
+    await setRpc({
+      'jsonrpc': '2.0',
+      'method': 'Favourites.AddFavourite',
+      'params': {
+        'title': heading,
+        'type': 'window',
+        'window': variant,
+        'windowparameter': starter,
+        'thumbnail': picture ?? '',
+      },
+      'id': 1
+    });
+  }
+
+  Future<void> setKodiKeyboardList(List<String> payload) async {
+    await setSetting('locale.keyboardlayouts', payload);
+    await setSetting('locale.activekeyboardlayout', payload);
+  }
+
   Future<void> setKodiLanguageForAudio(String payload) async {
     await setSetting('locale.audiolanguage', payload);
   }
 
   Future<void> setKodiLanguageForSubtitles(String payload) async {
     await setSetting('locale.subtitlelanguage', payload);
+  }
+
+  Future<void> setKodiLanguageForSystem(String payload) async {
+    await setKodiDependency('resource.language.$payload');
+    await setSetting('locale.language', 'resource.language.$payload');
   }
 
   Future<void> setKodiLanguageListForDownloadedSubtitles(List<String> payload) async {
@@ -147,6 +213,14 @@ class Kodi extends Updater {
     await android.runRepeat('keycode_enter');
     await android.runSelect('//*[@text="Allow only while using the app"]');
     await android.runRepeat('keycode_home');
+  }
+
+  Future<void> setKodiSubtitleServiceForMovies(String payload) async {
+    await setSetting('subtitles.movie', payload);
+  }
+
+  Future<void> setKodiSubtitleServiceForSeries(String payload) async {
+    await setSetting('subtitles.tv', payload);
   }
 
   Future<void> setKodiWebserver({bool enabled = false, bool secured = true}) async {
