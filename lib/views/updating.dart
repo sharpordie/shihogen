@@ -81,8 +81,8 @@ class UpdatingViewModel extends ViewModel {
       try {
         loading.value = true;
         // await setAlauncher1();
-        await setKodinerdsNexus();
-        // await setKodinerdsOmega();
+        // await setKodinerdsNexus();
+        await setKodinerdsOmega();
         // await setKodiVstream();
         // await setSpotify();
         // await setStn();
@@ -91,7 +91,8 @@ class UpdatingViewModel extends ViewModel {
         if (context.mounted) message.value = 'Has succeeded';
         failure.value = false;
         success.value = true;
-      } catch (e) {
+      } catch (e, stacktrace) {
+        debugPrint(stacktrace.toString());
         debugPrint(e.toString());
         if (context.mounted) message.value = 'Has failed';
         failure.value = true;
@@ -126,14 +127,19 @@ class UpdatingViewModel extends ViewModel {
     final updater = KodinerdsNexus(android);
     // await updater.runRemove();
     await updater.runUpdate();
-    await android.runFinish(updater.package);
-    await updater.setKodiWebserver(enabled: true, secured: false);
 
+    await android.runFinish(updater.package);
+    await updater.setEstuaryMenuList(enabled: false);
+    await updater.setEstuaryFavourites(enabled: true);
+    await updater.setKodiEnableUnknownSources(enabled: true);
+
+    await updater.setKodiWebserver(enabled: true, secured: false);
     await updater.setKodiAfr(enabled: true);
     await updater.setKodiAfrDelay(seconds: 3.5);
     await updater.setKodiAudioPassthrough(enabled: true);
     await updater.setKodiEnablePreferDefaultAudio(enabled: true);
     await updater.setKodiEnableShowParentFolder(enabled: false);
+    await updater.setKodiEnableUpdateFromAnyRepositories(enabled: true);
     await updater.setKodiKeyboardList(['French AZERTY']);
     await updater.setKodiLanguageForAudio('default');
     await updater.setKodiLanguageForSubtitles('forced_only');
@@ -141,10 +147,10 @@ class UpdatingViewModel extends ViewModel {
     await updater.setKodiLanguageListForDownloadedSubtitles(['English']);
     await updater.setKodiSubtitleServiceForMovies('');
     await updater.setKodiSubtitleServiceForSeries('');
-
     await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
     await Future.delayed(const Duration(seconds: 5));
     await android.runFinish(updater.package);
+
     await updater.setKodiWebserver(enabled: false, secured: true);
   }
 
@@ -153,16 +159,21 @@ class UpdatingViewModel extends ViewModel {
     final package = KodinerdsNexus(android);
     await android.runFinish(package.package);
     final updater = KodinerdsOmega(android);
-    // await updater.runRemove();
+    await updater.runRemove();
     await updater.runUpdate();
-    await android.runFinish(updater.package);
-    await updater.setKodiWebserver(enabled: true, secured: false);
 
+    await android.runFinish(updater.package);
+    await updater.setEstuaryMenuList(enabled: false);
+    await updater.setEstuaryFavourites(enabled: true);
+    await updater.setKodiEnableUnknownSources(enabled: true);
+
+    await updater.setKodiWebserver(enabled: true, secured: false);
     await updater.setKodiAfr(enabled: true);
     await updater.setKodiAfrDelay(seconds: 3.5);
     await updater.setKodiAudioPassthrough(enabled: true);
     await updater.setKodiEnablePreferDefaultAudio(enabled: false);
     await updater.setKodiEnableShowParentFolder(enabled: false);
+    await updater.setKodiEnableUpdateFromAnyRepositories(enabled: true);
     await updater.setKodiKeyboardList(['French AZERTY']);
     await updater.setKodiLanguageForAudio('English');
     await updater.setKodiLanguageForSubtitles('French');
@@ -170,10 +181,17 @@ class UpdatingViewModel extends ViewModel {
     await updater.setKodiLanguageListForDownloadedSubtitles(['French']);
     await updater.setKodiSubtitleServiceForMovies('service.subtitles.a4ksubtitles');
     await updater.setKodiSubtitleServiceForSeries('service.subtitles.a4ksubtitles');
-
     await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
     await Future.delayed(const Duration(seconds: 5));
     await android.runFinish(updater.package);
+
+    await updater.setKodiWebserver(enabled: true, secured: false);
+    await updater.setA4ksubtitlesAddon();
+    await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(updater.package);
+    await updater.setA4ksubtitlesEnableAutoDownload(enabled: true);
+
     await updater.setKodiWebserver(enabled: false, secured: true);
   }
 

@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adbnerve/adbnerve.dart';
+import 'package:dedent/dedent.dart';
 import 'package:dio/dio.dart';
 import 'package:netnerve/netnerve.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:shihogen/updaters/updater.dart';
 import 'package:xml/xml.dart';
 import 'package:xml/xpath.dart';
@@ -113,6 +116,15 @@ class Kodi extends Updater {
     return (await android.runInvoke(command)).exitCode == 0;
   }
 
+  Future<void> setKodiAddonEnabled(String payload, {bool enabled = true}) async {
+    await setRpc({
+      'jsonrpc': '2.0',
+      'method': 'Addons.SetAddonEnabled',
+      'params': {'addonid': payload, 'enabled': enabled ? true : false},
+      'id': 1
+    });
+  }
+
   Future<void> setKodiAfr({bool enabled = false}) async {
     await setSetting('videoplayer.adjustrefreshrate', enabled ? 2 : 0);
   }
@@ -154,6 +166,16 @@ class Kodi extends Updater {
 
   Future<void> setKodiEnableShowParentFolder({bool enabled = false}) async {
     await setSetting('filelists.showparentdiritems', enabled ? true : false);
+  }
+
+  Future<void> setKodiEnableUnknownSources({bool enabled = false}) async {
+    // await setSetting('addons.unknownsources', enabled ? true : false);
+    final distant = '$deposit/userdata/guisettings.xml';
+    await setXml(distant, '//*[@id="addons.unknownsources"]', enabled ? 'true' : 'false');
+  }
+
+  Future<void> setKodiEnableUpdateFromAnyRepositories({bool enabled = false}) async {
+    await setSetting('addons.updatemode', enabled ? 1 : 0);
   }
 
   Future<void> setKodiFavourite(String heading, String variant, String starter, String? picture) async {
@@ -235,4 +257,201 @@ class Kodi extends Updater {
       await Future.delayed(const Duration(seconds: 1));
     }
   }
+
+  ///
+
+  Future<void> setEstuaryMenuList({bool enabled = true}) async {
+    await setEstuaryFavourites(enabled: enabled);
+    await setEstuaryGames(enabled: enabled);
+    await setEstuaryMovie(enabled: enabled);
+    await setEstuaryMusic(enabled: enabled);
+    await setEstuaryMusicVideo(enabled: enabled);
+    await setEstuaryPictures(enabled: enabled);
+    await setEstuaryPrograms(enabled: enabled);
+    await setEstuaryRadio(enabled: enabled);
+    await setEstuaryTv(enabled: enabled);
+    await setEstuaryTvShow(enabled: enabled);
+    await setEstuaryVideos(enabled: enabled);
+    await setEstuaryWeather(enabled: enabled);
+  }
+
+  Future<void> setEstuaryMenu(String payload, {bool enabled = true}) async {
+    payload = payload.replaceFirst('homemenuno', '');
+    final distant = '$deposit/userdata/addon_data/skin.estuary/settings.xml';
+    await setXml(distant, '//*[@id="homemenuno$payload"]', (!enabled).toString());
+  }
+
+  Future<void> setEstuaryFavourites({bool enabled = true}) async {
+    await setEstuaryMenu('favbutton', enabled: enabled);
+  }
+
+  Future<void> setEstuaryGames({bool enabled = true}) async {
+    await setEstuaryMenu('gamesbutton', enabled: enabled);
+  }
+
+  Future<void> setEstuaryMovie({bool enabled = true}) async {
+    await setEstuaryMenu('moviebutton', enabled: enabled);
+  }
+
+  Future<void> setEstuaryMusic({bool enabled = true}) async {
+    await setEstuaryMenu('musicbutton', enabled: enabled);
+  }
+
+  Future<void> setEstuaryMusicVideo({bool enabled = true}) async {
+    await setEstuaryMenu('musicvideobutton', enabled: enabled);
+  }
+
+  Future<void> setEstuaryPictures({bool enabled = true}) async {
+    await setEstuaryMenu('picturesbutton', enabled: enabled);
+  }
+
+  Future<void> setEstuaryPrograms({bool enabled = true}) async {
+    await setEstuaryMenu('programsbutton', enabled: enabled);
+  }
+
+  Future<void> setEstuaryRadio({bool enabled = true}) async {
+    await setEstuaryMenu('radiobutton', enabled: enabled);
+  }
+
+  Future<void> setEstuaryTv({bool enabled = true}) async {
+    await setEstuaryMenu('tvbutton', enabled: enabled);
+  }
+
+  Future<void> setEstuaryTvShow({bool enabled = true}) async {
+    await setEstuaryMenu('tvshowbutton', enabled: enabled);
+  }
+
+  Future<void> setEstuaryVideos({bool enabled = true}) async {
+    await setEstuaryMenu('videosbutton', enabled: enabled);
+  }
+
+  Future<void> setEstuaryWeather({bool enabled = true}) async {
+    await setEstuaryMenu('weatherbutton', enabled: enabled);
+  }
+
+  ///
+
+  Future<void> setA4ksubtitlesAddon() async {
+    const payload = 'service.subtitles.a4ksubtitles';
+    if (await hasKodiAddon(payload)) return;
+    await setA4ksubtitlesAddonDependencies();
+    await setA4ksubtitlesAddonRepository();
+    final fetcher = Dio()
+      ..options.followRedirects = true
+      ..options.headers = {'user-agent': 'mozilla/5.0'};
+    const website = 'https://api.github.com/repos/a4k-openproject/a4kSubtitles/releases/latest';
+    final content = await (await fetcher.get(website)).data;
+    final version = content['name'].toString().replaceFirst('v', '');
+    final address = 'https://github.com/a4k-openproject/a4kSubtitles/archive/refs/tags/$payload/$payload-$version.zip';
+    final archive = await getFromAddress(address);
+    await android.runUnpack(archive!.path, '$deposit/addons');
+    final results = await android.runSearch('$deposit/addons/a4kSubtitles-service*');
+    final command = ['shell', 'mv ${results![0]} $deposit/addons/$payload'];
+    await android.runInvoke(command);
+    await setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(package);
+    await setKodiWebserver(enabled: true, secured: false);
+    await setKodiAddonEnabled(payload, enabled: true);
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runRepeat('keycode_home');
+  }
+
+  Future<void> setA4ksubtitlesDefaults() async {
+    // final results = await setRpc({
+    //   'jsonrpc': '2.0',
+    //   'method': 'GUI.ActivateWindow',
+    //   'params': {
+    //     'window': 'videos',
+    //     'parameters': ['addons://repos/'],
+    //   },
+    //   'id': 1
+    // });
+    await android.runFinish(package);
+    final distant = '$deposit/userdata/addon_data/service.subtitles.a4ksubtitles/settings.xml';
+    final configs = File(p.join((await getTemporaryDirectory()).path, 'settings.xml'));
+    await configs.writeAsString(dedent('''
+      <settings version="2">
+          <setting id="general.timeout">15</setting>
+          <setting id="general.results_limit">20</setting>
+          <setting id="general.auto_search" default="true">false</setting>
+          <setting id="general.auto_download" default="true">false</setting>
+          <setting id="general.use_chardet">true</setting>
+          <setting id="addic7ed.enabled">true</setting>
+          <setting id="bsplayer.enabled">true</setting>
+          <setting id="opensubtitles.enabled">true</setting>
+          <setting id="podnadpisi.enabled">true</setting>
+          <setting id="subscene.enabled">true</setting>
+          <setting id="opensubtitles.username" default="true" />
+          <setting id="opensubtitles.password" default="true" />
+      </settings>
+    '''));
+    await android.runExport(configs.path, distant);
+  }
+
+  Future<void> setA4ksubtitlesAddonDependencies() async {
+    await setKodiDependency('script.module.certifi');
+    await setKodiDependency('script.module.chardet');
+    await setKodiDependency('script.module.idna');
+    await setKodiDependency('script.module.requests');
+    await setKodiDependency('script.module.urllib3');
+  }
+
+  Future<void> setA4ksubtitlesAddonRepository() async {
+    const payload = 'repository.a4ksubtitles';
+    if (await hasKodiAddon(payload)) return;
+    var baseurl = 'https://a4k-openproject.github.io/a4kSubtitles/packages';
+    var address = '$baseurl/a4kSubtitles-repository.zip';
+    var archive = await getFromAddress(address);
+    await android.runUnpack(archive!.path, '$deposit/addons');
+    final results = await android.runSearch('$deposit/addons/a4kSubtitles-repository*');
+    final command = ['shell', 'mv ${results![0]} $deposit/addons/$payload'];
+    await android.runInvoke(command);
+    await setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(package);
+    await setKodiWebserver(enabled: true, secured: false);
+    await setKodiAddonEnabled(payload, enabled: true);
+    await android.runRepeat('keycode_home');
+  }
+
+  Future<void> setA4ksubtitlesEnableAutoDownload({bool enabled = false}) async {
+    final distant = '$deposit/userdata/addon_data/service.subtitles.a4ksubtitles/settings.xml';
+    final present = (await android.runInvoke(['shell', 'test -d "$distant"'])).exitCode == 0;
+    if (!present) await setA4ksubtitlesDefaults();
+    await setXml(distant, '//*[@id="general.auto_search"]', enabled ? 'true' : 'false', adjunct: false);
+    await setXml(distant, '//*[@id="general.auto_download"]', enabled ? 'true' : 'false', adjunct: false);
+  }
+
+  ///
+
+  Future<void> setFenAddon() async {}
+
+  Future<void> setFenAddonDependencies() async {}
+
+  Future<void> setFenAddonRepository() async {}
+
+  Future<void> setFenPairForRealdebrid((String, String) private) async {}
+
+  Future<void> setFenPairForTrakt((String, String) private) async {}
+
+  ///
+
+  Future<void> setVstreamAddon() async {}
+
+  Future<void> setVstreamAddonDependencies() async {}
+
+  Future<void> setVstreamAddonRepository() async {}
+
+  Future<void> setVstreamEnableActivateSubtitles({bool enabled = false}) async {}
+
+  Future<void> setVstreamEnablePlayNextEpisode({bool enabled = false}) async {}
+
+  Future<void> setVstreamForcedWidelist({bool enabled = false}) async {}
+
+  Future<void> setVstreamPairForRealdebrid((String, String) private) async {}
+
+  Future<void> setVstreamPairForTrakt((String, String) private) async {}
+
+  Future<void> setVstreamPastebinCodes() async {}
 }
