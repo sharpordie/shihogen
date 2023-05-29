@@ -249,6 +249,7 @@ class Kodi extends Updater {
   Future<void> setKodiWebserver({bool enabled = false, bool secured = true}) async {
     final distant = '$deposit/userdata/guisettings.xml';
     await setXml(distant, '//*[@id="services.webserver"]', enabled ? 'true' : 'false');
+    await setXml(distant, '//*[@id="services.esenabled"]', enabled ? 'true' : 'false'); // TODO: Verify this.
     await setXml(distant, '//*[@id="services.webserverauthentication"]', secured ? 'true' : 'false');
     if (!enabled) return;
     await android.runLaunch(package);
@@ -260,6 +261,11 @@ class Kodi extends Updater {
   }
 
   ///
+
+  Future<void> setEstuaryColor(String payload) async {
+    final distant = '$deposit/userdata/guisettings.xml';
+    await setXml(distant, '//*[@id="lookandfeel.skincolors"]', payload);
+  }
 
   Future<void> setEstuaryMenuList({bool enabled = true}) async {
     await setEstuaryFavourites(enabled: enabled);
@@ -598,8 +604,11 @@ class Kodi extends Updater {
   }
 
   Future<void> setVstreamFavourites() async {
-    var adjunct = 'plugin://plugin.video.vstream/?function=showMenuFilms&sFav=showMenuFilms&site=pastebin&siteUrl=https://pastebin.com/raw/&numPage=1&sMedia=film&title=Films';
-    var picture = '$deposit/addons/plugin.video.vstream/resources/art/films.png';
+    var adjunct = 'plugin://plugin.video.vstream/?function=getViewing&sFav=getViewing&site=cViewing&title=Toutes les catégories';
+    var picture = '$deposit/addons/plugin.video.vstream/resources/art/listes.png';
+    await setKodiFavourite('En cours', 'videos', adjunct, picture);
+    adjunct = 'plugin://plugin.video.vstream/?function=showMenuFilms&sFav=showMenuFilms&site=pastebin&siteUrl=https://pastebin.com/raw/&numPage=1&sMedia=film&title=Films';
+    picture = '$deposit/addons/plugin.video.vstream/resources/art/films.png';
     await setKodiFavourite('Films', 'videos', adjunct, picture);
     adjunct = 'plugin://plugin.video.vstream/?function=showMenuTvShows&sFav=showMenuTvShows&site=pastebin&title=Séries';
     picture = '$deposit/addons/plugin.video.vstream/resources/art/series.png';

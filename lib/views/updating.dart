@@ -88,7 +88,7 @@ class UpdatingViewModel extends ViewModel {
         await setSpotify();
         await setStn();
         await setAlauncher2();
-        // await setShield();
+        await setShield();
         if (context.mounted) message.value = 'Has succeeded';
         failure.value = false;
         success.value = true;
@@ -115,9 +115,9 @@ class UpdatingViewModel extends ViewModel {
   Future<void> setAlauncher2() async {
     message.value = 'Alauncher package';
     final updater = Alauncher(android);
-    await updater.setCategory('_', 130);
-    await updater.setCategory('_', 90);
-    await updater.setCategory('_', 90);
+    await updater.setCategory('_', 110);
+    await updater.setCategory('_', 100);
+    await updater.setCategory('_', 100);
     await updater.setApplicationByIndex('Kodinerds', 3);
     await updater.setApplicationByIndex('Spotify', 3);
     await updater.setApplicationByIndex('STN Beta', 3);
@@ -134,6 +134,7 @@ class UpdatingViewModel extends ViewModel {
     await updater.setPip(enabled: false);
 
     await android.runFinish(updater.package);
+    await updater.setEstuaryColor('SKINDEFAULT');
     await updater.setEstuaryMenuList(enabled: false);
     await updater.setEstuaryFavourites(enabled: true);
     await updater.setKodiEnableUnknownSources(enabled: true);
@@ -184,6 +185,7 @@ class UpdatingViewModel extends ViewModel {
     await updater.setPip(enabled: false);
 
     await android.runFinish(updater.package);
+    await updater.setEstuaryColor('SKINDEFAULT');
     await updater.setEstuaryMenuList(enabled: false);
     await updater.setEstuaryFavourites(enabled: true);
     await updater.setKodiEnableUnknownSources(enabled: true);
@@ -234,7 +236,10 @@ class UpdatingViewModel extends ViewModel {
 
   Future<void> setShield() async {
     message.value = 'Shield settings';
-    await Future.delayed(const Duration(seconds: 5));
+    await android.setResolution(ShieldResolution.p2160DolbyHz59);
+    await android.setUpscaling(ShieldUpscaling.enhanced);
+    await android.setLanguage(DeviceLanguage.frFr);
+    await android.runReboot();
   }
 
   Future<void> setSpotify() async {
@@ -242,7 +247,6 @@ class UpdatingViewModel extends ViewModel {
     final updater = Spotify(android);
     await updater.runRemove();
     await updater.runUpdate();
-    await updater.setPip(enabled: false);
   }
 
   Future<void> setStn() async {
