@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_plus/mvvm_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shihogen/widgets/own_appbar.dart';
 import 'package:shihogen/widgets/own_header.dart';
 import 'package:shihogen/widgets/own_insert.dart';
@@ -63,6 +64,7 @@ class AccountsView extends ViewWidget<AccountsViewModel> {
 }
 
 class AccountsViewModel extends ViewModel {
+  late final SharedPreferences sharing;
   late final loading = createProperty<bool>(false);
   late final realdebridPassword = TextEditingController();
   late final realdebridUsername = TextEditingController();
@@ -74,6 +76,14 @@ class AccountsViewModel extends ViewModel {
   late final uptoboxUsername = TextEditingController();
   late final youtubePassword = TextEditingController();
   late final youtubeUsername = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    () async {
+      sharing = await SharedPreferences.getInstance();
+    }();
+  }
 
   @override
   void dispose() {
@@ -92,6 +102,16 @@ class AccountsViewModel extends ViewModel {
 
   Future<void> onDoneClicked() async {
     loading.value = true;
+    await sharing.setString('realdebridPassword', realdebridPassword.text);
+    await sharing.setString('realdebridUsername', realdebridUsername.text);
+    await sharing.setString('spotifyPassword', spotifyPassword.text);
+    await sharing.setString('spotifyUsername', spotifyUsername.text);
+    await sharing.setString('traktPassword', traktPassword.text);
+    await sharing.setString('traktUsername', traktUsername.text);
+    await sharing.setString('uptoboxPassword', uptoboxPassword.text);
+    await sharing.setString('uptoboxUsername', uptoboxUsername.text);
+    await sharing.setString('youtubePassword', youtubePassword.text);
+    await sharing.setString('youtubeUsername', youtubeUsername.text);
     if (context.mounted) await Navigator.pushNamed(context, '/updating');
     loading.value = false;
   }

@@ -358,15 +358,6 @@ class Kodi extends Updater {
   }
 
   Future<void> setA4ksubtitlesDefaults() async {
-    // final results = await setRpc({
-    //   'jsonrpc': '2.0',
-    //   'method': 'GUI.ActivateWindow',
-    //   'params': {
-    //     'window': 'videos',
-    //     'parameters': ['addons://repos/'],
-    //   },
-    //   'id': 1
-    // });
     await android.runFinish(package);
     final distant = '$deposit/userdata/addon_data/service.subtitles.a4ksubtitles/settings.xml';
     final configs = File(p.join((await getTemporaryDirectory()).path, 'settings.xml'));
@@ -425,33 +416,240 @@ class Kodi extends Updater {
 
   ///
 
-  Future<void> setFenAddon() async {}
+  Future<void> setFenAddon() async {
+    var payload = 'plugin.video.fen';
+    if (await hasKodiAddon(payload)) return;
+    await setFenAddonDependencies();
+    await setFenAddonRepository();
+    final fetcher = Dio()
+      ..options.followRedirects = true
+      ..options.headers = {'user-agent': 'mozilla/5.0'};
+    var baseurl = 'https://github.com/Tikipeter/repository.tikipeter';
+    var website = '$baseurl/tree/main/zips/plugin.video.fen';
+    var pattern = RegExp('title="plugin.video.fen-([\\d.]+).zip"');
+    var content = await (await fetcher.get(website)).data;
+    var version = pattern.allMatches(content).last.group(1);
+    var address = '$baseurl/raw/main/zips/plugin.video.fen/plugin.video.fen-$version.zip';
+    var archive = await getFromAddress(address);
+    await android.runUnpack(archive!.path, '$deposit/addons');
+    await setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(package);
+    await setKodiWebserver(enabled: true, secured: false);
+    await setKodiAddonEnabled(payload, enabled: true);
+    await setFenFavourites();
+    payload = 'script.module.cocoscrapers';
+    baseurl = 'https://github.com/CocoJoe2411/repository.cocoscrapers';
+    website = '$baseurl/tree/main/zips/script.module.cocoscrapers';
+    pattern = RegExp('title="script.module.cocoscrapers-([\\d.]+).zip"');
+    content = await (await fetcher.get(website)).data;
+    version = pattern.allMatches(content).last.group(1);
+    address = '$baseurl/raw/main/zips/script.module.cocoscrapers/script.module.cocoscrapers-$version.zip';
+    archive = await getFromAddress(address);
+    await android.runUnpack(archive!.path, '$deposit/addons');
+    await setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(package);
+    await setKodiWebserver(enabled: true, secured: false);
+    await setKodiAddonEnabled(payload, enabled: true);
+    await android.runRepeat('keycode_home');
+  }
 
-  Future<void> setFenAddonDependencies() async {}
+  Future<void> setFenAddonDependencies() async {
+    await setKodiDependency('script.module.certifi');
+    await setKodiDependency('script.module.chardet');
+    await setKodiDependency('script.module.idna');
+    await setKodiDependency('script.module.requests');
+    await setKodiDependency('script.module.urllib3');
+  }
 
-  Future<void> setFenAddonRepository() async {}
+  Future<void> setFenAddonRepository() async {
+    const payload = 'repository.tikipeter';
+    if (await hasKodiAddon(payload)) return;
+    final fetcher = Dio()
+      ..options.followRedirects = true
+      ..options.headers = {'user-agent': 'mozilla/5.0'};
+    var website = 'https://tikipeter.github.io';
+    var pattern = RegExp('href="repository.tikipeter-([\\d.]+).zip"');
+    var content = await (await fetcher.get(website)).data;
+    var version = pattern.firstMatch(content)?.group(1);
+    var address = '$website/repository.tikipeter-$version.zip';
+    var archive = await getFromAddress(address);
+    await android.runUnpack(archive!.path, '$deposit/addons');
+    await setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(package);
+    await setKodiWebserver(enabled: true, secured: false);
+    await setKodiAddonEnabled(payload, enabled: true);
+    await android.runRepeat('keycode_home');
+  }
 
-  Future<void> setFenPairForRealdebrid((String, String) private) async {}
+  Future<void> setFenFavourites() async {
+    var adjunct = 'plugin://plugin.video.fen';
+    var picture = '$deposit/addons/plugin.video.fen/resources/media/fen_icon.png';
+    await setKodiFavourite('Fen', 'videos', adjunct, picture);
+  }
+
+  Future<void> setFenMetadataLanguage(String payload, String compact) async {
+    final distant = '$deposit/userdata/addon_data/plugin.video.fen/settings.xml';
+    await setXml(distant, '//*[@id="meta_language_display"]', payload);
+    await setXml(distant, '//*[@id="meta_language"]', compact);
+  }
+
+  Future<void> setFenPairForRealdebrid(({String username, String password}) private) async {
+    await setRpc({
+      'jsonrpc': '2.0',
+      'method': 'Addons.ExecuteAddon',
+      'params': {
+        'addonid': 'plugin.video.fen',
+        'params': {'mode': 'real_debrid.authenticate'}
+      },
+      'id': 0
+    });
+    await Future.delayed(const Duration(seconds: 8));
+    final pattern = RegExp('Enter the following code: (.*)');
+    final picture = await android.runScreen();
+    final matches = await android.runLookup(File(picture!), pattern);
+    if (matches != null) {
+      final pincode = matches.first.group(1).toString().replaceAll(' ', '');
+      await setPairForRealdebrid(private, pincode);
+      await Future.delayed(const Duration(seconds: 8));
+    }
+  }
 
   Future<void> setFenPairForTrakt((String, String) private) async {}
 
   ///
 
-  Future<void> setVstreamAddon() async {}
+  Future<void> setVstreamAddon() async {
+    var payload = 'plugin.video.vstream';
+    if (await hasKodiAddon(payload)) return;
+    await setVstreamAddonDependencies();
+    await setVstreamAddonRepository();
+    const address = 'https://api.github.com/repos/Kodi-vStream/venom-xbmc-addons/releases/latest';
+    final archive = await getFromGithub(address, RegExp('.*.zip'));
+    await android.runUnpack(archive!.path, '$deposit/addons');
+    await setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(package);
+    await setKodiWebserver(enabled: true, secured: false);
+    await setKodiAddonEnabled(payload, enabled: true);
+    await setVstreamFavourites();
+    await android.runRepeat('keycode_home');
+  }
 
-  Future<void> setVstreamAddonDependencies() async {}
+  Future<void> setVstreamAddonDependencies() async {
+    await setKodiDependency('script.module.certifi');
+    await setKodiDependency('script.module.chardet');
+    await setKodiDependency('script.module.idna');
+    await setKodiDependency('script.module.pyqrcode');
+    await setKodiDependency('script.module.requests');
+    await setKodiDependency('script.module.urllib3');
+  }
 
-  Future<void> setVstreamAddonRepository() async {}
+  Future<void> setVstreamAddonRepository() async {
+    const payload = 'repository.vstream';
+    if (await hasKodiAddon(payload)) return;
+    final fetcher = Dio()
+      ..options.followRedirects = true
+      ..options.headers = {'user-agent': 'mozilla/5.0'};
+    const website = 'https://kodi-vstream.github.io/repo';
+    final pattern = RegExp('href="repository.vstream-([\\d.]+).zip"');
+    final content = await (await fetcher.get(website)).data;
+    final version = pattern.allMatches(content).last.group(1);
+    var address = '$website/repository.vstream-$version.zip';
+    var archive = await getFromAddress(address);
+    await android.runUnpack(archive!.path, '$deposit/addons');
+    await setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(package);
+    await setKodiWebserver(enabled: true, secured: false);
+    await setKodiAddonEnabled(payload, enabled: true);
+    await android.runRepeat('keycode_home');
+  }
 
-  Future<void> setVstreamEnableActivateSubtitles({bool enabled = false}) async {}
+  Future<void> setVstreamEnableActivateSubtitles({bool enabled = false}) async {
+    final distant = '$deposit/userdata/addon_data/plugin.video.vstream/settings.xml';
+    await setXml(distant, '//*[@id="srt-view"]', enabled ? 'true' : 'false', adjunct: false);
+  }
 
-  Future<void> setVstreamEnablePlayNextEpisode({bool enabled = false}) async {}
+  Future<void> setVstreamEnableDisplaySeasonTitle({bool enabled = false}) async {
+    final distant = '$deposit/userdata/addon_data/plugin.video.vstream/settings.xml';
+    await setXml(distant, '//*[@id="display_season_title"]', enabled ? 'true' : 'false');
+  }
 
-  Future<void> setVstreamForcedWidelist({bool enabled = false}) async {}
+  Future<void> setVstreamEnablePlayNextEpisode({bool enabled = false}) async {
+    if (enabled) await setKodiDependency('service.upnext');
+    final distant = '$deposit/userdata/addon_data/plugin.video.vstream/settings.xml';
+    await setXml(distant, '//*[@id="upnext"]', enabled ? 'true' : 'false', adjunct: false);
+  }
 
-  Future<void> setVstreamPairForRealdebrid((String, String) private) async {}
+  Future<void> setVstreamEnableWidelistEverywhere({bool enabled = false}) async {
+    final distant = '$deposit/userdata/addon_data/plugin.video.vstream/settings.xml';
+    await setXml(distant, '//*[@id="active-view"]', enabled ? 'true' : 'false');
+    await setXml(distant, '//*[@id="accueil-view"]', enabled ? '55' : '500', adjunct: false);
+    await setXml(distant, '//*[@id="default-view"]', enabled ? '55' : '50', adjunct: false);
+    await setXml(distant, '//*[@id="episodes-view"]', enabled ? '55' : '500', adjunct: false);
+    await setXml(distant, '//*[@id="movies-view"]', enabled ? '55' : '500', adjunct: false);
+    await setXml(distant, '//*[@id="seasons-view"]', enabled ? '55' : '500', adjunct: false);
+    await setXml(distant, '//*[@id="tvshows-view"]', enabled ? '55' : '500', adjunct: false);
+    await setXml(distant, '//*[@id="visuel-view"]', enabled ? '55' : '500', adjunct: false);
+  }
+
+  Future<void> setVstreamFavourites() async {
+    var adjunct = 'plugin://plugin.video.vstream/?function=showMenuFilms&sFav=showMenuFilms&site=pastebin&siteUrl=https://pastebin.com/raw/&numPage=1&sMedia=film&title=Films';
+    var picture = '$deposit/addons/plugin.video.vstream/resources/art/films.png';
+    await setKodiFavourite('Films', 'videos', adjunct, picture);
+    adjunct = 'plugin://plugin.video.vstream/?function=showMenuTvShows&sFav=showMenuTvShows&site=pastebin&title=Séries';
+    picture = '$deposit/addons/plugin.video.vstream/resources/art/series.png';
+    await setKodiFavourite('Séries', 'videos', adjunct, picture);
+    adjunct = 'plugin://plugin.video.vstream/?function=showMenuMangas&sFav=showMenuMangas&site=pastebin&title=Animes';
+    picture = '$deposit/addons/plugin.video.vstream/resources/art/animes.png';
+    await setKodiFavourite('Animes', 'videos', adjunct, picture);
+  }
+
+  Future<void> setVstreamPairForRealdebrid(({String username, String password}) private) async {
+    final payload = await getTokenForRealdebrid(private);
+    if (payload == null) return;
+    final distant = '$deposit/userdata/addon_data/plugin.video.vstream/settings.xml';
+    await setXml(distant, '//*[@id="hoster_realdebrid_premium"]', 'true');
+    await setXml(distant, '//*[@id="hoster_realdebrid_token"]', payload);
+  }
 
   Future<void> setVstreamPairForTrakt((String, String) private) async {}
 
-  Future<void> setVstreamPastebinCodes() async {}
+  Future<void> setVstreamPastebinCodes() async {
+    final distant = '$deposit/userdata/addon_data/plugin.video.vstream/settings.xml';
+    var fetched = await android.runImport(distant);
+    if (fetched == null) return;
+    var content = XmlDocument.parse(await File(fetched).readAsString());
+    final factors = [
+      ['pastebin_label_1', 'ANIMES'],
+      ['pastebin_id_1', 'oil7fmFZ8'],
+      ['pastebin_label_2', 'CARTOONS'],
+      ['pastebin_id_2', 'hr2TRGkt4'],
+      ['pastebin_label_3', 'CONCERTS'],
+      ['pastebin_id_3', 'B4oyP1nPe'],
+      ['pastebin_label_4', 'DOCUMENTARIES'],
+      ['pastebin_id_4', '8PMoBQaj4'],
+      ['pastebin_label_5', 'MOVIES'],
+      ['pastebin_id_5', 'BeiPlyWEc'],
+      ['pastebin_label_6', 'SERIES'],
+      ['pastebin_id_6', 'euqrrb8Db'],
+      ['pastebin_label_7', 'SPECTACLES'],
+      ['pastebin_id_7', 'WjhMJHje5'],
+    ];
+    for (final element in factors) {
+      if (content.xpath('//*[@id="${element[0]}"]').isEmpty) {
+        final builder = XmlBuilder();
+        builder.element('setting', nest: () {
+          builder.attribute('id', element[0]);
+          builder.text(element[1]);
+        });
+        content.document?.firstChild?.children.add(builder.buildDocument().firstChild!.copy());
+      }
+    }
+    await File(fetched).writeAsString(content.toXmlString());
+    await android.runExport(fetched, distant);
+  }
 }

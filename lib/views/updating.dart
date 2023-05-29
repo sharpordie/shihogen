@@ -80,13 +80,12 @@ class UpdatingViewModel extends ViewModel {
     } else {
       try {
         loading.value = true;
-        // await setAlauncher1();
-        // await setKodinerdsNexus();
+        await setAlauncher1();
+        await setKodinerdsNexus();
         await setKodinerdsOmega();
-        // await setKodiVstream();
         // await setSpotify();
         // await setStn();
-        // await setAlauncher2();
+        await setAlauncher2();
         // await setShield();
         if (context.mounted) message.value = 'Has succeeded';
         failure.value = false;
@@ -106,6 +105,7 @@ class UpdatingViewModel extends ViewModel {
   Future<void> setAlauncher1() async {
     message.value = 'Alauncher package';
     final updater = Alauncher(android);
+    await updater.runUpdate();
     await updater.runVanishCategories();
     await updater.setWallpaper(sharing.getString('picture')!);
   }
@@ -125,7 +125,7 @@ class UpdatingViewModel extends ViewModel {
     final package = KodinerdsOmega(android);
     await android.runFinish(package.package);
     final updater = KodinerdsNexus(android);
-    // await updater.runRemove();
+    await updater.runRemove();
     await updater.runUpdate();
 
     await android.runFinish(updater.package);
@@ -150,6 +150,21 @@ class UpdatingViewModel extends ViewModel {
     await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
     await Future.delayed(const Duration(seconds: 5));
     await android.runFinish(updater.package);
+
+    await updater.setKodiWebserver(enabled: true, secured: false);
+    await updater.setVstreamAddon();
+    await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(updater.package);
+
+    await android.runFinish(updater.package);
+    await updater.setVstreamEnableActivateSubtitles(enabled: true);
+    await updater.setVstreamEnableDisplaySeasonTitle(enabled: false);
+    await updater.setVstreamEnablePlayNextEpisode(enabled: true);
+    await updater.setVstreamEnableWidelistEverywhere(enabled: true);
+    final private = (username: sharing.getString('realdebridUsername') ?? '', password: sharing.getString('realdebridPassword') ?? '');
+    if (private.username.isNotEmpty && private.password.isNotEmpty) await updater.setVstreamPairForRealdebrid(private);
+    await updater.setVstreamPastebinCodes();
 
     await updater.setKodiWebserver(enabled: false, secured: true);
   }
@@ -189,8 +204,24 @@ class UpdatingViewModel extends ViewModel {
     await updater.setA4ksubtitlesAddon();
     await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
     await Future.delayed(const Duration(seconds: 5));
+
     await android.runFinish(updater.package);
     await updater.setA4ksubtitlesEnableAutoDownload(enabled: true);
+
+    await updater.setKodiWebserver(enabled: true, secured: false);
+    await updater.setFenAddon();
+    await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(updater.package);
+
+    await updater.setKodiWebserver(enabled: true, secured: false);
+    final private = (username: sharing.getString('realdebridUsername') ?? '', password: sharing.getString('realdebridPassword') ?? '');
+    if (private.username.isNotEmpty && private.password.isNotEmpty) await updater.setFenPairForRealdebrid(private);
+    await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+
+    await android.runFinish(updater.package);
+    await updater.setFenMetadataLanguage('French', 'fr');
 
     await updater.setKodiWebserver(enabled: false, secured: true);
   }
