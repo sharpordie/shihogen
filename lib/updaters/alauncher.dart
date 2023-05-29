@@ -12,6 +12,10 @@ class Alauncher extends Updater {
   String get package => 'org.mywire.alauncher';
 
   @override
+  String get heading => 'aLauncher';
+
+
+  @override
   Future<File?> runGather() async {
     const address = 'https://api.github.com/repos/4v3ngR/aLauncher/releases/latest';
     return await getFromGithub(address, RegExp('arm64-v8a-release.apk'));

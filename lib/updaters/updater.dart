@@ -13,6 +13,8 @@ abstract class Updater {
 
   String get package;
 
+  String get heading;
+
   Future<File?> runGather();
 
   Future<bool> getRecent() async {
@@ -39,5 +41,9 @@ abstract class Updater {
       final fetched = await runGather();
       if (fetched != null) await android.runUpdate(fetched.path);
     }
+  }
+
+  Future<void> setPip({bool enabled = true}) async {
+    await android.setPictureInPicture(heading, enabled: enabled);
   }
 }

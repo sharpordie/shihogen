@@ -17,9 +17,10 @@ class Kodi extends Updater {
   @override
   String get package => 'org.xbmc.kodi';
 
-  String get deposit => '/sdcard/Android/data/$package/files/.kodi';
-
+  @override
   String get heading => 'Kodi';
+
+  String get deposit => '/sdcard/Android/data/$package/files/.kodi';
 
   String get release => 'nexus';
 

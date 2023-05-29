@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shihogen/updaters/alauncher.dart';
 import 'package:shihogen/updaters/kodinerds_nexus.dart';
 import 'package:shihogen/updaters/kodinerds_omega.dart';
+import 'package:shihogen/updaters/spotify.dart';
+import 'package:shihogen/updaters/stn_beta.dart';
 import 'package:shihogen/widgets/own_appbar.dart';
 import 'package:shihogen/widgets/own_header.dart';
 
@@ -83,8 +85,8 @@ class UpdatingViewModel extends ViewModel {
         await setAlauncher1();
         await setKodinerdsNexus();
         await setKodinerdsOmega();
-        // await setSpotify();
-        // await setStn();
+        await setSpotify();
+        await setStn();
         await setAlauncher2();
         // await setShield();
         if (context.mounted) message.value = 'Has succeeded';
@@ -117,6 +119,8 @@ class UpdatingViewModel extends ViewModel {
     await updater.setCategory('_', 90);
     await updater.setCategory('_', 90);
     await updater.setApplicationByIndex('Kodinerds', 3);
+    await updater.setApplicationByIndex('Spotify', 3);
+    await updater.setApplicationByIndex('STN Beta', 3);
     await updater.setApplicationByIndex('Kodinerds Omega', 3);
   }
 
@@ -127,6 +131,7 @@ class UpdatingViewModel extends ViewModel {
     final updater = KodinerdsNexus(android);
     await updater.runRemove();
     await updater.runUpdate();
+    await updater.setPip(enabled: false);
 
     await android.runFinish(updater.package);
     await updater.setEstuaryMenuList(enabled: false);
@@ -176,6 +181,7 @@ class UpdatingViewModel extends ViewModel {
     final updater = KodinerdsOmega(android);
     await updater.runRemove();
     await updater.runUpdate();
+    await updater.setPip(enabled: false);
 
     await android.runFinish(updater.package);
     await updater.setEstuaryMenuList(enabled: false);
@@ -233,11 +239,17 @@ class UpdatingViewModel extends ViewModel {
 
   Future<void> setSpotify() async {
     message.value = 'Spotify package';
-    await Future.delayed(const Duration(seconds: 5));
+    final updater = Spotify(android);
+    await updater.runRemove();
+    await updater.runUpdate();
+    await updater.setPip(enabled: false);
   }
 
   Future<void> setStn() async {
     message.value = 'SmartTubeNext package';
-    await Future.delayed(const Duration(seconds: 5));
+    final updater = StnBeta(android);
+    await updater.runRemove();
+    await updater.runUpdate();
+    await updater.setPip(enabled: false);
   }
 }
