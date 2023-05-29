@@ -1,9 +1,5 @@
-import 'dart:isolate';
-
-import 'package:adbnerve/adbnerve.dart';
 import 'package:flutter/material.dart';
 import 'package:mvvm_plus/mvvm_plus.dart';
-import 'package:network_discovery/network_discovery.dart';
 import 'package:shihogen/widgets/own_appbar.dart';
 import 'package:shihogen/widgets/own_header.dart';
 
