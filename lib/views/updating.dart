@@ -129,7 +129,7 @@ class UpdatingViewModel extends ViewModel {
     final package = KodinerdsOmega(android);
     await android.runFinish(package.package);
     final updater = KodinerdsNexus(android);
-    await updater.runRemove();
+    // await updater.runRemove();
     await updater.runUpdate();
     await updater.setPip(enabled: false);
 
@@ -180,7 +180,7 @@ class UpdatingViewModel extends ViewModel {
     final package = KodinerdsNexus(android);
     await android.runFinish(package.package);
     final updater = KodinerdsOmega(android);
-    await updater.runRemove();
+    // await updater.runRemove();
     await updater.runUpdate();
     await updater.setPip(enabled: false);
 
@@ -245,14 +245,14 @@ class UpdatingViewModel extends ViewModel {
   Future<void> setSpotify() async {
     message.value = 'Spotify package';
     final updater = Spotify(android);
-    await updater.runRemove();
+    // await updater.runRemove();
     await updater.runUpdate();
   }
 
   Future<void> setStn() async {
     message.value = 'SmartTubeNext package';
     final updater = StnBeta(android);
-    await updater.runRemove();
+    // await updater.runRemove();
     await updater.runUpdate();
     await updater.setPip(enabled: false);
   }

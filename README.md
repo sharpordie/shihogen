@@ -10,14 +10,21 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 <img src="assets/img06.png" width="18.8%"/><img src="assets/blank.png" width="1.5%"/><img src="assets/img07.png" width="18.8%"/><img src="assets/blank.png" width="1.5%"/><img src="assets/img08.png" width="18.8%"/><img src="assets/blank.png" width="1.5%"/><img src="assets/img09.png" width="18.8%"/><img src="assets/blank.png" width="1.5%"/><img src="assets/img10.png" width="18.8%"/>
 
-#### ON YOUR DEVICE 
+#### ON YOUR DEVICE
 
 <img src="assets/img11.png" width="49.25%"/><img src="assets/blank.png" width="1.5%"/><img src="assets/img12.png" width="49.25%"/>
 
 # <samp>GUIDANCE</samp>
 
+#### CREATE PACKAGE
+
+```shell
+flutter build apk --release --split-per-abi
+```
+
+#### LAUNCH PACKAGE
+
 1. Enable the network debugging on your device.
-1. Gather and launch the app on your mobile.
 1. Follow instructions to attach your device.
 1. Choose wallpaper for your home screen.
 1. Insert optional accounts information.

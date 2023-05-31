@@ -74,11 +74,9 @@ class LauncherViewModel extends ViewModel {
   late final pictureIndex = createProperty(0);
   late final pictureController = PageController();
   late final pictureItems = [
-    'kI9tiDhDpeav28nlwDwTUbUwiSx', // Avatar
     'kQdyZtEo4iBjoJ82SX5oTCoRwjR', // The Last of Us
     'zNv4duaroFrXeEHXvMZI3bq1l34', // The Simpsons
-    'iHSwvRVsRyxpX7FE7GbviaDvgGZ', // Wednesday 1
-    'wYPKRllm4OsviEjK1l1yt3U8PS7', // Wednesday 2
+    'wYPKRllm4OsviEjK1l1yt3U8PS7', // Wednesday
   ];
 
   @override
