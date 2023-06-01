@@ -137,6 +137,7 @@ class UpdatingViewModel extends ViewModel {
     await updater.setEstuaryColor('SKINDEFAULT');
     await updater.setEstuaryMenuList(enabled: false);
     await updater.setEstuaryFavourites(enabled: true);
+    await updater.setKodiEnableKeymapFix(enabled: true);
     await updater.setKodiEnableUnknownSources(enabled: true);
 
     await updater.setKodiWebserver(enabled: true, secured: false);
@@ -188,6 +189,7 @@ class UpdatingViewModel extends ViewModel {
     await updater.setEstuaryColor('SKINDEFAULT');
     await updater.setEstuaryMenuList(enabled: false);
     await updater.setEstuaryFavourites(enabled: true);
+    await updater.setKodiEnableKeymapFix(enabled: true);
     await updater.setKodiEnableUnknownSources(enabled: true);
 
     await updater.setKodiWebserver(enabled: true, secured: false);

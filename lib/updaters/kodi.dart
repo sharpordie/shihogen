@@ -138,10 +138,10 @@ class Kodi extends Updater {
   Future<void> setKodiAudioPassthrough({bool enabled = false}) async {
     final payload = enabled ? [true, 10] : [false, 1];
     await setSetting('audiooutput.channels', payload[1]);
+    await setSetting('audiooutput.passthrough', payload[0]);
     await setSetting('audiooutput.dtshdpassthrough', payload[0]);
     await setSetting('audiooutput.dtspassthrough', payload[0]);
     await setSetting('audiooutput.eac3passthrough', payload[0]);
-    await setSetting('audiooutput.passthrough', payload[0]);
     await setSetting('audiooutput.truehdpassthrough', payload[0]);
   }
 
@@ -159,6 +159,24 @@ class Kodi extends Updater {
     final address = '$baseurl/$payload/$payload-$version.zip';
     final archive = await getFromAddress(address);
     await android.runUnpack(archive!.path, '$deposit/addons');
+  }
+
+  Future<void> setKodiEnableKeymapFix({bool enabled = false}) async {
+    final distant = '$deposit/userdata/keymaps/keyboard.xml';
+    await android.runRemove(distant);
+    if (enabled) {
+      final configs = File(p.join((await getTemporaryDirectory()).path, 'keyboard.xml'));
+      await configs.writeAsString(dedent('''
+        <keymap>
+            <fullscreenvideo>
+                <keyboard>
+                    <backspace>Stop</backspace>
+                </keyboard>
+            </fullscreenvideo>
+        </keymap>
+      '''));
+      await android.runExport(configs.path, distant);
+    }
   }
 
   Future<void> setKodiEnablePreferDefaultAudio({bool enabled = false}) async {
