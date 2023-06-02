@@ -535,27 +535,22 @@ class Kodi extends Updater {
   }
 
   Future<void> setFenPairForRealdebrid(({String username, String password}) private) async {
-    var correct = false;
-    while(!correct) {
-      await setRpc({
-        'jsonrpc': '2.0',
-        'method': 'Addons.ExecuteAddon',
-        'params': {
-          'addonid': 'plugin.video.fen',
-          'params': {'mode': 'real_debrid.authenticate'}
-        },
-        'id': 0
-      });
-      await Future.delayed(const Duration(seconds: 8));
-      final pattern = RegExp('Enter the following code: (.*)');
-      final picture = await android.runScreen();
-      final matches = await android.runLookup(File(picture!), pattern);
-      if (matches == null) {
-        await android.runFinish(package);
-        return;
-      }
+    await setRpc({
+      'jsonrpc': '2.0',
+      'method': 'Addons.ExecuteAddon',
+      'params': {
+        'addonid': 'plugin.video.fen',
+        'params': {'mode': 'real_debrid.authenticate'}
+      },
+      'id': 0
+    });
+    await Future.delayed(const Duration(seconds: 8));
+    final pattern = RegExp('Enter the following code: (.*)');
+    final picture = await android.runScreen();
+    final matches = await android.runLookup(File(picture!), pattern);
+    if (matches != null) {
       final pincode = matches.first.group(1).toString().replaceAll(' ', '');
-      correct = await setPairForRealdebrid(private, pincode);
+      await setPairForRealdebrid(private, pincode);
       await Future.delayed(const Duration(seconds: 4));
     }
   }
