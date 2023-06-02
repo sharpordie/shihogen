@@ -136,13 +136,21 @@ class Kodi extends Updater {
   }
 
   Future<void> setKodiAudioPassthrough({bool enabled = false}) async {
-    final payload = enabled ? [true, 10] : [false, 1];
-    await setSetting('audiooutput.channels', payload[1]);
-    await setSetting('audiooutput.passthrough', payload[0]);
-    await setSetting('audiooutput.dtshdpassthrough', payload[0]);
-    await setSetting('audiooutput.dtspassthrough', payload[0]);
-    await setSetting('audiooutput.eac3passthrough', payload[0]);
-    await setSetting('audiooutput.truehdpassthrough', payload[0]);
+    // final payload = enabled ? [true, 10] : [false, 1];
+    // await setSetting('audiooutput.channels', payload[1]);
+    // await setSetting('audiooutput.passthrough', payload[0]);
+    // await setSetting('audiooutput.dtshdpassthrough', payload[0]);
+    // await setSetting('audiooutput.dtspassthrough', payload[0]);
+    // await setSetting('audiooutput.eac3passthrough', payload[0]);
+    // await setSetting('audiooutput.truehdpassthrough', payload[0]);
+    final distant = '$deposit/userdata/guisettings.xml';
+    final payload = enabled ? ['true', '10'] : ['false', '1'];
+    await setXml(distant, '//*[@id="audiooutput.channels"]', payload[1]);
+    await setXml(distant, '//*[@id="audiooutput.passthrough"]', payload[0]);
+    await setXml(distant, '//*[@id="audiooutput.dtshdpassthrough"]', payload[0]);
+    await setXml(distant, '//*[@id="audiooutput.dtspassthrough"]', payload[0]);
+    await setXml(distant, '//*[@id="audiooutput.eac3passthrough"]', payload[0]);
+    await setXml(distant, '//*[@id="audiooutput.truehdpassthrough"]', payload[0]);
   }
 
   Future<void> setKodiDependency(String payload, {bool imposed = false}) async {
@@ -254,6 +262,11 @@ class Kodi extends Updater {
     await android.runRepeat('keycode_enter');
     await android.runSelect('//*[@text="Allow only while using the app"]');
     await android.runRepeat('keycode_home');
+  }
+
+  Future<void> setKodiSettingLevel(String payload) async {
+    final distant = '$deposit/userdata/guisettings.xml';
+    await setXml(distant, '//general/settinglevel', payload);
   }
 
   Future<void> setKodiSubtitleServiceForMovies(String payload) async {
@@ -522,23 +535,28 @@ class Kodi extends Updater {
   }
 
   Future<void> setFenPairForRealdebrid(({String username, String password}) private) async {
-    await setRpc({
-      'jsonrpc': '2.0',
-      'method': 'Addons.ExecuteAddon',
-      'params': {
-        'addonid': 'plugin.video.fen',
-        'params': {'mode': 'real_debrid.authenticate'}
-      },
-      'id': 0
-    });
-    await Future.delayed(const Duration(seconds: 8));
-    final pattern = RegExp('Enter the following code: (.*)');
-    final picture = await android.runScreen();
-    final matches = await android.runLookup(File(picture!), pattern);
-    if (matches != null) {
-      final pincode = matches.first.group(1).toString().replaceAll(' ', '');
-      await setPairForRealdebrid(private, pincode);
+    var correct = false;
+    while(!correct) {
+      await setRpc({
+        'jsonrpc': '2.0',
+        'method': 'Addons.ExecuteAddon',
+        'params': {
+          'addonid': 'plugin.video.fen',
+          'params': {'mode': 'real_debrid.authenticate'}
+        },
+        'id': 0
+      });
       await Future.delayed(const Duration(seconds: 8));
+      final pattern = RegExp('Enter the following code: (.*)');
+      final picture = await android.runScreen();
+      final matches = await android.runLookup(File(picture!), pattern);
+      if (matches == null) {
+        await android.runFinish(package);
+        return;
+      }
+      final pincode = matches.first.group(1).toString().replaceAll(' ', '');
+      correct = await setPairForRealdebrid(private, pincode);
+      await Future.delayed(const Duration(seconds: 4));
     }
   }
 
@@ -622,9 +640,12 @@ class Kodi extends Updater {
   }
 
   Future<void> setVstreamFavourites() async {
-    var adjunct = 'plugin://plugin.video.vstream/?function=getViewing&sFav=getViewing&site=cViewing&title=Toutes les catégories';
-    var picture = '$deposit/addons/plugin.video.vstream/resources/art/listes.png';
-    await setKodiFavourite('En cours', 'videos', adjunct, picture);
+    // var adjunct = 'plugin://plugin.video.vstream/?function=getViewing&sFav=getViewing&site=cViewing&title=Toutes les catégories';
+    // var picture = '$deposit/addons/plugin.video.vstream/resources/art/listes.png';
+    // await setKodiFavourite('En cours', 'videos', adjunct, picture);
+    var adjunct = 'plugin://plugin.video.vstream/?function=getWatched&sFav=getWatched&site=cWatched&title=Toutes les catégories';
+    var picture = '$deposit/addons/plugin.video.vstream/resources/art/annees.png';
+    await setKodiFavourite('Historique', 'videos', adjunct, picture);
     adjunct = 'plugin://plugin.video.vstream/?function=showMenuFilms&sFav=showMenuFilms&site=pastebin&siteUrl=https://pastebin.com/raw/&numPage=1&sMedia=film&title=Films';
     picture = '$deposit/addons/plugin.video.vstream/resources/art/films.png';
     await setKodiFavourite('Films', 'videos', adjunct, picture);

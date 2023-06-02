@@ -137,13 +137,15 @@ class UpdatingViewModel extends ViewModel {
     await updater.setEstuaryColor('SKINDEFAULT');
     await updater.setEstuaryMenuList(enabled: false);
     await updater.setEstuaryFavourites(enabled: true);
+    await updater.setKodiAudioPassthrough(enabled: true);
     await updater.setKodiEnableKeymapFix(enabled: true);
     await updater.setKodiEnableUnknownSources(enabled: true);
+    await updater.setKodiSettingLevel('3');
 
     await updater.setKodiWebserver(enabled: true, secured: false);
     await updater.setKodiAfr(enabled: true);
     await updater.setKodiAfrDelay(seconds: 3.5);
-    await updater.setKodiAudioPassthrough(enabled: true);
+    // await updater.setKodiAudioPassthrough(enabled: true);
     await updater.setKodiEnablePreferDefaultAudio(enabled: true);
     await updater.setKodiEnableShowParentFolder(enabled: false);
     await updater.setKodiEnableUpdateFromAnyRepositories(enabled: true);
@@ -189,13 +191,15 @@ class UpdatingViewModel extends ViewModel {
     await updater.setEstuaryColor('SKINDEFAULT');
     await updater.setEstuaryMenuList(enabled: false);
     await updater.setEstuaryFavourites(enabled: true);
+    await updater.setKodiAudioPassthrough(enabled: true);
     await updater.setKodiEnableKeymapFix(enabled: true);
     await updater.setKodiEnableUnknownSources(enabled: true);
+    await updater.setKodiSettingLevel('3');
 
     await updater.setKodiWebserver(enabled: true, secured: false);
     await updater.setKodiAfr(enabled: true);
     await updater.setKodiAfrDelay(seconds: 3.5);
-    await updater.setKodiAudioPassthrough(enabled: true);
+    // await updater.setKodiAudioPassthrough(enabled: true);
     await updater.setKodiEnablePreferDefaultAudio(enabled: false);
     await updater.setKodiEnableShowParentFolder(enabled: false);
     await updater.setKodiEnableUpdateFromAnyRepositories(enabled: true);
@@ -238,6 +242,7 @@ class UpdatingViewModel extends ViewModel {
 
   Future<void> setShield() async {
     message.value = 'Shield settings';
+    await android.setBloatware(enabled: false);
     await android.setResolution(ShieldResolution.p2160DolbyHz59);
     await android.setUpscaling(ShieldUpscaling.enhanced);
     await android.setLanguage(DeviceLanguage.frFr);
