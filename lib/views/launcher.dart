@@ -78,6 +78,8 @@ class LauncherViewModel extends ViewModel {
     'kQdyZtEo4iBjoJ82SX5oTCoRwjR', // The Last of Us
     'zNv4duaroFrXeEHXvMZI3bq1l34', // The Simpsons
     'wYPKRllm4OsviEjK1l1yt3U8PS7', // Wednesday
+    '1gGRY9bnIc0Jaohgc6jNFidjgLK', // American Horror Story
+    'AvsNXUbP7UKCVnypyx2eWp8z2N3', // Hazbin Hotel
   ];
 
   @override
@@ -92,7 +94,7 @@ class LauncherViewModel extends ViewModel {
     loading.value = true;
     const segment = 'https://www.themoviedb.org/t/p/original/';
     await sharing.setString('picture', '$segment/${picture.value}.jpg');
-    if (context.mounted) await Navigator.pushNamed(context, '/accounts');
+    if (context.mounted) await Navigator.pushNamed(context, '/settings');
     loading.value = false;
   }
 }

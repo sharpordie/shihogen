@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shihogen/views/accounts.dart';
+import 'package:shihogen/views/settings.dart';
 import 'package:shihogen/views/discover.dart';
 import 'package:shihogen/views/guidance.dart';
 import 'package:shihogen/views/launcher.dart';
@@ -26,7 +26,7 @@ Widget myApp() {
       '/discover': (context) => DiscoverView(),
       '/guidance': (context) => GuidanceView(),
       '/launcher': (context) => LauncherView(),
-      '/accounts': (context) => AccountsView(),
+      '/settings': (context) => SettingsView(),
       '/updating': (context) => UpdatingView(),
     },
   );

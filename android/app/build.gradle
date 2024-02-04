@@ -27,7 +27,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     namespace "com.example.shihogen"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34 // flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {

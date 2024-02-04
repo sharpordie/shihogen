@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:netnerve/netnerve.dart';
 import 'package:shihogen/updaters/updater.dart';
 
-class StnBeta extends Updater {
-  StnBeta(super.android);
+class SmarttubeBeta extends Updater {
+  SmarttubeBeta(super.android);
 
   @override
   String get package => 'com.liskovsoft.smarttubetv.beta';
 
   @override
-  String get heading => 'STN Beta';
+  String get heading => 'SmartTube beta';
 
   @override
   Future<File?> runGather() async {

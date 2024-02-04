@@ -269,12 +269,67 @@ class Kodi extends Updater {
     await setXml(distant, '//general/settinglevel', payload);
   }
 
+  Future<void> setKodiSmartPlaylistForAnimesOnly() async {
+    var distant = '$deposit/userdata/playlists/video/Animes.xsp';
+    await android.runRemove(distant);
+    final configs = File(p.join((await getTemporaryDirectory()).path, 'Animes.xsp'));
+    await configs.writeAsString(dedent('''
+      <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+      <smartplaylist type="tvshows">
+          <name>Animes</name>
+          <match>all</match>
+          <rule field="path" operator="contains">
+              <value>animes</value>
+          </rule>
+          <order direction="ascending">sorttitle</order>
+      </smartplaylist>
+    '''));
+    await android.runExport(configs.path, distant);
+  }
+
+  Future<void> setKodiSmartPlaylistForSeriesOnly() async {
+    var distant = '$deposit/userdata/playlists/video/Series.xsp';
+    await android.runRemove(distant);
+    final configs = File(p.join((await getTemporaryDirectory()).path, 'Series.xsp'));
+    await configs.writeAsString(dedent('''
+      <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+      <smartplaylist type="tvshows">
+          <name>Series</name>
+          <match>all</match>
+          <rule field="path" operator="contains">
+              <value>series</value>
+          </rule>
+          <order direction="ascending">sorttitle</order>
+      </smartplaylist>
+    '''));
+    await android.runExport(configs.path, distant);
+  }
+
+  Future<void> setKodiSubtitleBorderSize({int payload = 25}) async {
+    if (payload < 0 || payload > 100) return;
+    // final distant = '$deposit/userdata/guisettings.xml';
+    // await setXml(distant, '//*[@id="subtitles.colorpick"]', payload.toString());
+    await setSetting('subtitles.bordersize', payload);
+  }
+
+  Future<void> setKodiSubtitleColor({String payload = "FFFFFFFF"}) async {
+    // final distant = '$deposit/userdata/guisettings.xml';
+    // await setXml(distant, '//*[@id="subtitles.colorpick"]', payload);
+    await setSetting('subtitles.colorpick', payload);
+  }
+
   Future<void> setKodiSubtitleServiceForMovies(String payload) async {
     await setSetting('subtitles.movie', payload);
   }
 
   Future<void> setKodiSubtitleServiceForSeries(String payload) async {
     await setSetting('subtitles.tv', payload);
+  }
+
+  Future<void> setKodiTvShowSelectFirstUnwatchedItem({bool enabled = false}) async {
+    // final distant = '$deposit/userdata/guisettings.xml';
+    // await setXml(distant, '//*[@id="videolibrary.tvshowsselectfirstunwatcheditem"]', enabled ? '2' : '0');
+    await setSetting('videolibrary.tvshowsselectfirstunwatcheditem', enabled ? 2 : 0);
   }
 
   Future<void> setKodiWebserver({bool enabled = false, bool secured = true}) async {
@@ -559,6 +614,19 @@ class Kodi extends Updater {
 
   ///
 
+  Future<void> setLocalFavourites() async {
+    var adjunct = 'videodb://movies/titles/';
+    await setKodiFavourite('Films', 'videos', adjunct, 'DefaultMovies.png');
+    adjunct = 'special://profile/playlists/video/Series.xsp';
+    await setKodiFavourite('Séries', 'videos', adjunct, 'DefaultTVShows.png');
+    adjunct = 'special://profile/playlists/video/Animes.xsp';
+    await setKodiFavourite('ANIMES', 'videos', adjunct, 'DefaultAddonLookAndFeel.png');
+    adjunct = 'addons://user/xbmc.addon.video';
+    await setKodiFavourite('ADDONS', 'videos', adjunct, 'DefaultAddSource.png');
+  }
+
+  ///
+
   Future<void> setVstreamAddon() async {
     var payload = 'plugin.video.vstream';
     if (await hasKodiAddon(payload)) return;
@@ -606,6 +674,12 @@ class Kodi extends Updater {
     await android.runRepeat('keycode_home');
   }
 
+  Future<void> setVstreamAlldebridToken(String payload) async {
+    final distant = '$deposit/userdata/addon_data/plugin.video.vstream/settings.xml';
+    await setXml(distant, '//*[@id="hoster_alldebrid_premium"]', 'true');
+    await setXml(distant, '//*[@id="hoster_alldebrid_token"]', payload);
+  }
+
   Future<void> setVstreamEnableActivateSubtitles({bool enabled = false}) async {
     final distant = '$deposit/userdata/addon_data/plugin.video.vstream/settings.xml';
     await setXml(distant, '//*[@id="srt-view"]', enabled ? 'true' : 'false', adjunct: false);
@@ -635,21 +709,26 @@ class Kodi extends Updater {
   }
 
   Future<void> setVstreamFavourites() async {
-    // var adjunct = 'plugin://plugin.video.vstream/?function=getViewing&sFav=getViewing&site=cViewing&title=Toutes les catégories';
-    // var picture = '$deposit/addons/plugin.video.vstream/resources/art/listes.png';
+    var adjunct = '';
+    var picture = '';
+    // adjunct = 'plugin://plugin.video.vstream/?function=getViewing&sFav=getViewing&site=cViewing&title=Toutes les catégories';
+    // picture = '$deposit/addons/plugin.video.vstream/resources/art/listes.png';
     // await setKodiFavourite('En cours', 'videos', adjunct, picture);
-    var adjunct = 'plugin://plugin.video.vstream/?function=getWatched&sFav=getWatched&site=cWatched&title=Toutes les catégories';
-    var picture = '$deposit/addons/plugin.video.vstream/resources/art/annees.png';
-    await setKodiFavourite('Historique', 'videos', adjunct, picture);
     adjunct = 'plugin://plugin.video.vstream/?function=showMenuFilms&sFav=showMenuFilms&site=pastebin&siteUrl=https://pastebin.com/raw/&numPage=1&sMedia=film&title=Films';
     picture = '$deposit/addons/plugin.video.vstream/resources/art/films.png';
-    await setKodiFavourite('Films', 'videos', adjunct, picture);
+    await setKodiFavourite('FILMS', 'videos', adjunct, picture);
     adjunct = 'plugin://plugin.video.vstream/?function=showMenuTvShows&sFav=showMenuTvShows&site=pastebin&title=Séries';
     picture = '$deposit/addons/plugin.video.vstream/resources/art/series.png';
-    await setKodiFavourite('Séries', 'videos', adjunct, picture);
-    adjunct = 'plugin://plugin.video.vstream/?function=showMenuMangas&sFav=showMenuMangas&site=pastebin&title=Animes';
-    picture = '$deposit/addons/plugin.video.vstream/resources/art/animes.png';
-    await setKodiFavourite('Animes', 'videos', adjunct, picture);
+    await setKodiFavourite('SÉRIES', 'videos', adjunct, picture);
+    adjunct = 'plugin://plugin.video.vstream/?function=getBookmarks&sFav=getBookmarks&site=cFav&siteUrl=http://venom&title=Mes marque-pages';
+    picture = '$deposit/addons/plugin.video.vstream/resources/art/mark.png';
+    await setKodiFavourite('MARQUE-PAGES', 'videos', adjunct, picture);
+    adjunct = 'plugin://plugin.video.vstream/?function=getWatched&sFav=getWatched&site=cWatched&title=Toutes les catégories';
+    picture = '$deposit/addons/plugin.video.vstream/resources/art/annees.png';
+    await setKodiFavourite('HISTORIQUE', 'videos', adjunct, picture);
+    // adjunct = 'plugin://plugin.video.vstream/?function=showMenuMangas&sFav=showMenuMangas&site=pastebin&title=Animes';
+    // picture = '$deposit/addons/plugin.video.vstream/resources/art/animes.png';
+    // await setKodiFavourite('ANIMES', 'videos', adjunct, picture);
   }
 
   Future<void> setVstreamPairForRealdebrid(({String username, String password}) private) async {
@@ -667,21 +746,31 @@ class Kodi extends Updater {
     var fetched = await android.runImport(distant);
     if (fetched == null) return;
     var content = XmlDocument.parse(await File(fetched).readAsString());
+    // final factors = [
+    //   ['pastebin_label_1', 'ANIMES'],
+    //   ['pastebin_id_1', 'oil7fmFZ8'],
+    //   ['pastebin_label_2', 'CARTOONS'],
+    //   ['pastebin_id_2', 'hr2TRGkt4'],
+    //   ['pastebin_label_3', 'CONCERTS'],
+    //   ['pastebin_id_3', 'B4oyP1nPe'],
+    //   ['pastebin_label_4', 'DOCUMENTARIES'],
+    //   ['pastebin_id_4', '8PMoBQaj4'],
+    //   ['pastebin_label_5', 'MOVIES'],
+    //   ['pastebin_id_5', 'BeiPlyWEc'],
+    //   ['pastebin_label_6', 'SERIES'],
+    //   ['pastebin_id_6', 'euqrrb8Db'],
+    //   ['pastebin_label_7', 'SPECTACLES'],
+    //   ['pastebin_id_7', 'WjhMJHje5'],
+    // ];
     final factors = [
-      ['pastebin_label_1', 'ANIMES'],
-      ['pastebin_id_1', 'oil7fmFZ8'],
-      ['pastebin_label_2', 'CARTOONS'],
-      ['pastebin_id_2', 'hr2TRGkt4'],
-      ['pastebin_label_3', 'CONCERTS'],
-      ['pastebin_id_3', 'B4oyP1nPe'],
-      ['pastebin_label_4', 'DOCUMENTARIES'],
-      ['pastebin_id_4', '8PMoBQaj4'],
-      ['pastebin_label_5', 'MOVIES'],
-      ['pastebin_id_5', 'BeiPlyWEc'],
-      ['pastebin_label_6', 'SERIES'],
-      ['pastebin_id_6', 'euqrrb8Db'],
-      ['pastebin_label_7', 'SPECTACLES'],
-      ['pastebin_id_7', 'WjhMJHje5'],
+      ['pastebin_label_1', 'MOVIES'],
+      ['pastebin_id_1', '1eda79b1'],
+      ['pastebin_label_2', 'SERIES'],
+      ['pastebin_id_2', '6730992c'],
+      ['pastebin_label_3', 'DOCUMENTARIES'],
+      ['pastebin_id_3', '00c0fdec'],
+      // ['pastebin_label_4', 'QUEBEC'],
+      // ['pastebin_id_4', '5da625b7'],
     ];
     for (final element in factors) {
       if (content.xpath('//*[@id="${element[0]}"]').isEmpty) {
@@ -695,5 +784,10 @@ class Kodi extends Updater {
     }
     await File(fetched).writeAsString(content.toXmlString());
     await android.runExport(fetched, distant);
+  }
+
+  Future<void> setVstreamPastebinUrl({String payload = 'https://paste.lesalkodiques.com/raw/'}) async {
+    final distant = '$deposit/userdata/addon_data/plugin.video.vstream/settings.xml';
+    await setXml(distant, '//*[@id="pastebin_url"]', payload);
   }
 }
