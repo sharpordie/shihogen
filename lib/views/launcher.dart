@@ -21,7 +21,7 @@ class LauncherView extends ViewWidget<LauncherViewModel> {
         children: [
           const OwnHeader(
             heading: 'Launcher',
-            message: 'Choose your wallpaper',
+            message: 'Choose your background',
           ),
           Expanded(
             child: Padding(
@@ -75,11 +75,8 @@ class LauncherViewModel extends ViewModel {
   late final pictureController = PageController();
   late final pictureItems = [
     'kI9tiDhDpeav28nlwDwTUbUwiSx', // Avatar
-    'kQdyZtEo4iBjoJ82SX5oTCoRwjR', // The Last of Us
-    'zNv4duaroFrXeEHXvMZI3bq1l34', // The Simpsons
-    'wYPKRllm4OsviEjK1l1yt3U8PS7', // Wednesday
+    '4e36PN10oS3x2zJtE30Del0uEHS', // Krampus
     '1gGRY9bnIc0Jaohgc6jNFidjgLK', // American Horror Story
-    'AvsNXUbP7UKCVnypyx2eWp8z2N3', // Hazbin Hotel
   ];
 
   @override

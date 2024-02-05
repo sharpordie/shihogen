@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:shihogen/views/settings.dart';
 import 'package:shihogen/views/discover.dart';
 import 'package:shihogen/views/guidance.dart';
 import 'package:shihogen/views/launcher.dart';
+import 'package:shihogen/views/settings.dart';
 import 'package:shihogen/views/updating.dart';
 import 'package:wakelock/wakelock.dart';
 
@@ -14,7 +13,6 @@ void main() async {
 }
 
 Widget myApp() {
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
   return MaterialApp(
     title: 'Shihogen',
     debugShowCheckedModeBanner: false,

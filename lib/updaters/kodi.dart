@@ -513,27 +513,29 @@ class Kodi extends Updater {
     var payload = 'plugin.video.fen';
     if (await hasKodiAddon(payload)) return;
     await setFenAddonDependencies();
-    await setFenAddonRepository();
+    // await setFenAddonRepository();
     final fetcher = Dio()
       ..options.followRedirects = true
       ..options.headers = {'user-agent': 'mozilla/5.0'};
-    var baseurl = 'https://github.com/Tikipeter/repository.tikipeter';
-    var website = '$baseurl/tree/main/zips/plugin.video.fen';
-    var pattern = RegExp('title="plugin.video.fen-([\\d.]+).zip"');
-    var content = await (await fetcher.get(website)).data;
+    var baseurl = 'https://tikipeter.github.io/packages/';
+    // var website = '$baseurl/tree/main/zips/plugin.video.fen';
+    var pattern = RegExp('plugin.video.fen-([\\d.]+).zip');
+    var content = await (await fetcher.get(baseurl)).data;
     var version = pattern.allMatches(content).last.group(1);
-    var address = '$baseurl/raw/main/zips/plugin.video.fen/plugin.video.fen-$version.zip';
+    var address = '$baseurl/plugin.video.fen-$version.zip';
     var archive = await getFromAddress(address);
     await android.runUnpack(archive!.path, '$deposit/addons');
     await setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
     await Future.delayed(const Duration(seconds: 5));
     await android.runFinish(package);
+
     await setKodiWebserver(enabled: true, secured: false);
     await setKodiAddonEnabled(payload, enabled: true);
     await setFenFavourites();
+    if (await hasKodiAddon('script.module.cocoscrapers')) return;
     payload = 'script.module.cocoscrapers';
     baseurl = 'https://github.com/CocoJoe2411/repository.cocoscrapers';
-    website = '$baseurl/tree/main/zips/script.module.cocoscrapers';
+    var website = '$baseurl/tree/main/zips/script.module.cocoscrapers';
     pattern = RegExp('title="script.module.cocoscrapers-([\\d.]+).zip"');
     content = await (await fetcher.get(website)).data;
     version = pattern.allMatches(content).last.group(1);
@@ -546,6 +548,8 @@ class Kodi extends Updater {
     await setKodiWebserver(enabled: true, secured: false);
     await setKodiAddonEnabled(payload, enabled: true);
     await android.runRepeat('keycode_home');
+
+
   }
 
   Future<void> setFenAddonDependencies() async {
@@ -575,6 +579,12 @@ class Kodi extends Updater {
     await setKodiWebserver(enabled: true, secured: false);
     await setKodiAddonEnabled(payload, enabled: true);
     await android.runRepeat('keycode_home');
+  }
+
+  Future<void> setFenExternalScraper() async {
+    final distant = '$deposit/userdata/addon_data/plugin.video.fen/settings.xml';
+    await setXml(distant, '//*[@id="hoster_alldebrid_premium"]', 'true');
+    await setXml(distant, '//*[@id="external_scraper.name"]', 'CocoScrapers Module');
   }
 
   Future<void> setFenFavourites() async {
@@ -623,6 +633,100 @@ class Kodi extends Updater {
     await setKodiFavourite('ANIMES', 'videos', adjunct, 'DefaultAddonLookAndFeel.png');
     adjunct = 'addons://user/xbmc.addon.video';
     await setKodiFavourite('ADDONS', 'videos', adjunct, 'DefaultAddSource.png');
+  }
+
+  ///
+
+  Future<void> setUmbrellaAddon() async {
+    var payload = 'plugin.video.umbrella';
+    if (await hasKodiAddon(payload)) return;
+    await setUmbrellaAddonDependencies();
+    await setUmbrellaAddonRepository();
+    final fetcher = Dio()
+      ..options.followRedirects = true
+      ..options.headers = {'user-agent': 'mozilla/5.0'};
+    var baseurl = 'https://github.com/umbrellaplug/umbrellaplug.github.io';
+    var website = '$baseurl/tree/master/nexus/zips/plugin.video.umbrella';
+    var pattern = RegExp('plugin.video.umbrella-([\\d.]+).zip');
+    var content = await (await fetcher.get(website)).data;
+    var version = pattern.allMatches(content).last.group(1);
+    var address = '$baseurl/raw/master/nexus/zips/plugin.video.umbrella/plugin.video.umbrella-$version.zip';
+    var archive = await getFromAddress(address);
+    await android.runUnpack(archive!.path, '$deposit/addons');
+    await setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(package);
+
+    await setKodiWebserver(enabled: true, secured: false);
+    await setKodiAddonEnabled(payload, enabled: true);
+    await setUmbrellaFavourites();
+    if (await hasKodiAddon('script.module.cocoscrapers')) return;
+    payload = 'script.module.cocoscrapers';
+    baseurl = 'https://github.com/CocoJoe2411/repository.cocoscrapers';
+    website = '$baseurl/tree/main/zips/script.module.cocoscrapers';
+    pattern = RegExp('script.module.cocoscrapers-([\\d.]+).zip');
+    content = await (await fetcher.get(website)).data;
+    version = pattern.allMatches(content).last.group(1);
+    address = '$baseurl/raw/main/zips/script.module.cocoscrapers/script.module.cocoscrapers-$version.zip';
+    archive = await getFromAddress(address);
+    await android.runUnpack(archive!.path, '$deposit/addons');
+    await setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(package);
+    await setKodiWebserver(enabled: true, secured: false);
+    await setKodiAddonEnabled(payload, enabled: true);
+    await android.runRepeat('keycode_home');
+  }
+
+  Future<void> setUmbrellaAddonDependencies() async {
+    await setKodiDependency('script.module.certifi');
+    await setKodiDependency('script.module.chardet');
+    await setKodiDependency('script.module.idna');
+    await setKodiDependency('script.module.requests');
+    await setKodiDependency('script.module.urllib3');
+  }
+
+  Future<void> setUmbrellaAddonRepository() async {
+    const payload = 'repository.umbrella';
+    if (await hasKodiAddon(payload)) return;
+    final fetcher = Dio()
+      ..options.followRedirects = true
+      ..options.headers = {'user-agent': 'mozilla/5.0'};
+    const website = 'https://umbrellaplug.github.io';
+    final pattern = RegExp('href="repository.umbrella-([\\d.]+).zip"');
+    final content = await (await fetcher.get(website)).data;
+    final version = pattern.allMatches(content).last.group(1);
+    var address = '$website/repository.umbrella-$version.zip';
+    var archive = await getFromAddress(address);
+    await android.runUnpack(archive!.path, '$deposit/addons');
+    await setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(package);
+    await setKodiWebserver(enabled: true, secured: false);
+    await setKodiAddonEnabled(payload, enabled: true);
+    await android.runRepeat('keycode_home');
+  }
+
+  Future<void> setUmbrellaAlldebridToken(String payload) async {
+    final distant = '$deposit/userdata/addon_data/plugin.video.umbrella/settings.xml';
+    await setXml(distant, '//*[@id="alldebrid.enable"]', 'true');
+    await setXml(distant, '//*[@id="alldebridtoken"]', payload);
+  }
+
+  Future<void> setUmbrellaExternalProvider() async {
+    final distant = '$deposit/userdata/addon_data/plugin.video.umbrella/settings.xml';
+    await setXml(distant, '//*[@id="provider.external.enabled"]', 'true');
+    await setXml(distant, '//*[@id="external_provider.name"]', 'cocoscrapers');
+    await setXml(distant, '//*[@id="external_provider.module"]', 'script.module.cocoscrapers');
+  }
+
+  Future<void> setUmbrellaFavourites() async {
+    var adjunct = 'plugin://plugin.video.umbrella/?action=movieNavigator&folderName=Discover Movies';
+    var picture = '$deposit/addons/plugin.video.umbrella/resources/artwork/umbrella/movies.png';
+    await setKodiFavourite('MOVIES', 'videos', adjunct, picture);
+    adjunct = 'plugin://plugin.video.umbrella/?action=tvNavigator&folderName=Discover TV Shows';
+    picture = '$deposit/addons/plugin.video.umbrella/resources/artwork/umbrella/tvshows.png';
+    await setKodiFavourite('SERIES', 'videos', adjunct, picture);
   }
 
   ///

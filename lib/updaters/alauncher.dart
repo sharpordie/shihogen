@@ -14,7 +14,6 @@ class Alauncher extends Updater {
   @override
   String get heading => 'aLauncher';
 
-
   @override
   Future<File?> runGather() async {
     const address = 'https://api.github.com/repos/4v3ngR/aLauncher/releases/latest';
