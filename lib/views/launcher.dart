@@ -75,8 +75,14 @@ class LauncherViewModel extends ViewModel {
   late final pictureController = PageController();
   late final pictureItems = [
     'kI9tiDhDpeav28nlwDwTUbUwiSx', // Avatar
-    '4e36PN10oS3x2zJtE30Del0uEHS', // Krampus
+    'e0Ro7wajZoxKWdhaisjchalEzh0', // American Horror Story
     '1gGRY9bnIc0Jaohgc6jNFidjgLK', // American Horror Story
+    'rqbCbjB19amtOtFQbb3K2lgm2zv', // Attack on Titan
+    '4e36PN10oS3x2zJtE30Del0uEHS', // Krampus
+    'k5qfeGVD6yY0HXYveMT6isJTbJG', // Stranger Things
+    '9zcbqSxdsRMZWHYtyCd1nXPr2xq', // The Mandalorian
+    's56eyXy8rADp5DpZknfe2HXq4u4', // The Witcher
+    'iHSwvRVsRyxpX7FE7GbviaDvgGZ', // Wednesday
   ];
 
   @override

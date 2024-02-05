@@ -115,6 +115,7 @@ class UpdatingViewModel extends ViewModel {
     final updater = Alauncher(android);
     await updater.runUpdate();
     await updater.runVanishCategories();
+    await updater.getAllBackgrounds();
     await updater.setWallpaper(sharing.getString('picture')!);
   }
 
@@ -136,8 +137,51 @@ class UpdatingViewModel extends ViewModel {
     await updater.setApplicationByIndex('Kodinerds Omega', 3);
   }
 
+  Future<void> setKodinerdsNexusForEnglish() async {
+    message.value = 'Kodinerds English';
+    final package = KodinerdsNexus(android);
+    await android.runFinish(package.package);
+    final updater = KodinerdsOmega(android);
+    // await updater.runRemove();
+    await updater.runUpdate();
+    await updater.setPip(enabled: false);
+
+    await android.runFinish(updater.package);
+    await updater.setEstuaryColor('SKINDEFAULT');
+    await updater.setEstuaryMenuList(enabled: false);
+    await updater.setEstuaryFavourites(enabled: true);
+    await updater.setKodiAudioPassthrough(enabled: true);
+    await updater.setKodiEnableKeymapFix(enabled: true);
+    await updater.setKodiEnableUnknownSources(enabled: true);
+    await updater.setKodiSettingLevel('3');
+
+    await updater.setKodiWebserver(enabled: true, secured: false);
+    await updater.setKodiAfr(enabled: true);
+    await updater.setKodiAfrDelay(seconds: 3.5);
+    await updater.setKodiEnablePreferDefaultAudio(enabled: false);
+    await updater.setKodiEnableShowParentFolder(enabled: false);
+    await updater.setKodiEnableUpdateFromAnyRepositories(enabled: true);
+    await updater.setKodiLanguageForSubtitles('English');
+    await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(updater.package);
+
+    await updater.setKodiWebserver(enabled: true, secured: false);
+    await updater.setUmbrellaAddon();
+    await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
+    await Future.delayed(const Duration(seconds: 5));
+    await android.runFinish(updater.package);
+
+    final private = sharing.getString('alldebridToken') ?? '';
+    if (private.isNotEmpty) await updater.setUmbrellaAlldebridToken(private);
+    await updater.setUmbrellaExternalProvider();
+    await Future.delayed(const Duration(seconds: 5));
+
+    await updater.setKodiWebserver(enabled: false, secured: true);
+  }
+
   Future<void> setKodinerdsNexusForFrench() async {
-    message.value = 'Kodinerds FRA';
+    message.value = 'Kodinerds French';
     final package = KodinerdsOmega(android);
     await android.runFinish(package.package);
     final updater = KodinerdsNexus(android);
@@ -186,53 +230,11 @@ class UpdatingViewModel extends ViewModel {
     await updater.setKodiWebserver(enabled: false, secured: true);
   }
 
-  Future<void> setKodinerdsNexusForEnglish() async {
-    message.value = 'Kodinerds ENG';
-    final package = KodinerdsNexus(android);
-    await android.runFinish(package.package);
-    final updater = KodinerdsOmega(android);
-    // await updater.runRemove();
-    await updater.runUpdate();
-    await updater.setPip(enabled: false);
-
-    await android.runFinish(updater.package);
-    await updater.setEstuaryColor('SKINDEFAULT');
-    await updater.setEstuaryMenuList(enabled: false);
-    await updater.setEstuaryFavourites(enabled: true);
-    await updater.setKodiAudioPassthrough(enabled: true);
-    await updater.setKodiEnableKeymapFix(enabled: true);
-    await updater.setKodiEnableUnknownSources(enabled: true);
-    await updater.setKodiSettingLevel('3');
-
-    await updater.setKodiWebserver(enabled: true, secured: false);
-    await updater.setKodiAfr(enabled: true);
-    await updater.setKodiAfrDelay(seconds: 3.5);
-    await updater.setKodiEnablePreferDefaultAudio(enabled: false);
-    await updater.setKodiEnableShowParentFolder(enabled: false);
-    await updater.setKodiEnableUpdateFromAnyRepositories(enabled: true);
-    await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
-    await Future.delayed(const Duration(seconds: 5));
-    await android.runFinish(updater.package);
-
-    await updater.setKodiWebserver(enabled: true, secured: false);
-    await updater.setUmbrellaAddon();
-    await updater.setRpc({'jsonrpc': '2.0', 'method': 'Application.Quit', 'params': {}, 'id': 1});
-    await Future.delayed(const Duration(seconds: 5));
-    await android.runFinish(updater.package);
-
-    final private = sharing.getString('alldebridToken') ?? '';
-    if (private.isNotEmpty) await updater.setUmbrellaAlldebridToken(private);
-    await updater.setUmbrellaExternalProvider();
-    await Future.delayed(const Duration(seconds: 5));
-
-    await updater.setKodiWebserver(enabled: false, secured: true);
-  }
-
   Future<void> setShield() async {
     message.value = 'Shield settings';
     await android.setBloatware(enabled: false);
     await android.setResolution(ShieldResolution.p2160DolbyHz59);
-    await android.setUpscaling(ShieldUpscaling.aiLow);
+    await android.setUpscaling(ShieldUpscaling.enhanced);
     await android.setLanguage(DeviceLanguage.frFr);
     await android.runReboot();
   }

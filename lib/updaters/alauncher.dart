@@ -4,6 +4,7 @@ import 'package:adbnerve/adbnerve.dart';
 import 'package:netnerve/netnerve.dart';
 import 'package:path/path.dart';
 import 'package:shihogen/updaters/updater.dart';
+import 'package:shihogen/views/launcher.dart';
 
 class Alauncher extends Updater {
   Alauncher(super.android);
@@ -40,6 +41,15 @@ class Alauncher extends Updater {
       await android.runRepeat('keycode_dpad_right', repeats: 99);
       await android.runRepeat('keycode_enter');
       await Future.delayed(const Duration(seconds: 5));
+    }
+  }
+
+  Future<void> getAllBackgrounds() async {
+    for (final picture in LauncherViewModel().pictureItems) {
+      final fetched = await getFromAddress(picture);
+      if (fetched == null) continue;
+      await Future.delayed(const Duration(seconds: 2));
+      await android.runExport(fetched.path, '/sdcard/Download');
     }
   }
 
