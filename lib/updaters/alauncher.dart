@@ -46,7 +46,8 @@ class Alauncher extends Updater {
 
   Future<void> getAllBackgrounds() async {
     for (final picture in LauncherViewModel().pictureItems) {
-      final fetched = await getFromAddress(picture);
+      final address = 'https://www.themoviedb.org/t/p/original/$picture.jpg';
+      final fetched = await getFromAddress(address);
       if (fetched == null) continue;
       await Future.delayed(const Duration(seconds: 2));
       await android.runExport(fetched.path, '/sdcard/Download');
